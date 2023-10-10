@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/page-login-register.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:06 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>Evara - eCommerce HTML Template</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/public/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/public/assets/css/main.css">
+</head>
+  <body>
+    <!-- <% if(typeof message !=='undefined'){ %>
+      <div class="alert alert-success text-center py-2 mb-2">
+        <h5><%= message %></h5>
+      </div>
+      <% } %> -->
+    <!-- Start Banner Area -->
+    <section>
+      <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center">
+          <h1>LOGIN PAGE</h1>
+        </div>
+      </div>
+    </section>
+    <!-- End Banner Area -->
+
+    <!--================Login Box Area =================-->
+    <section class="login_box_area section_gap">
+      <div class="container">
+        <div class="row ">
+
+          <div class="col-lg-5">
+            <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                <div class="padding_eight_all bg-white">
+                    <div class="heading_s1">
+                        <h3 class="mb-30">Login</h3>
+                    </div>
+                    <% if (message) { %>
+                      <h5 style="color: red;"><%= message %></h5>
+                    <% } %>
+                    <form action="/login" method="post">
+                        <div class="form-group">
+                            <input type="text" required="" name="email" placeholder="Your Email">
+                        </div>
+                        <div class="form-group">
+                            <input required="" type="password" name="password" placeholder="Password">
+                        </div>
+                        <div class="login_footer form-group">
+                            <div class="chek-form">
+                                <div class="custome-checkbox">
+                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
+                                    <label class="form-check-label" for="exampleCheckbox1"><span>Remember me</span></label>
+                                </div>
+                            </div>
+                            <a class="text-muted" href="#">Forgot password?</a>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
+                        </div>
+                    </form>
+                    <div class="text-muted text-center">New here? C'mon Sign Up <a href="/register">Sign up Now</a></div>
+                </div>
+            </div>
+        </div>
+          
+        </div>
+      </div>
+    </section>
+    <!--================End Login Box Area =================-->
+  </body>
+</html>

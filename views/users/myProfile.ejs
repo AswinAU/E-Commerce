@@ -1,0 +1,233 @@
+﻿<%- include('../layouts/header') %>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/userHome" rel="nofollow">Home</a>
+                    <span></span> Account
+                </div>
+            </div>
+        </div>
+        <section class="pt-150 pb-150">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 m-auto">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="dashboard-menu">
+                                    <ul class="nav flex-column" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="tab-content dashboard-content">
+                                    <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Hello <% if(locals.data)  {%> <%= data.name %> <%} %></h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <% if(locals.data)  {%> <%= data.email %> <%} %>
+                                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Your Orders</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                 <a href="/orderlist?id=<%=userdata%>"><h5 style="color: blue;">View Order Details</h5></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Orders tracking</h5>
+                                            </div>
+                                            <div class="card-body contact-from-area">
+                                                <p>To track your order please enter your OrderID in the box below and press "Track" button. This was given to you on your receipt and in the confirmation email you should have received.</p>
+                                                <div class="row">
+                                                    <div class="col-lg-8">
+                                                        <form class="contact-form-style mt-30 mb-50" action="#" method="post">
+                                                            <div class="input-style mb-20">
+                                                                <label>Order ID</label>
+                                                                <input name="order-id" placeholder="Found in your order confirmation email" type="text" class="square">
+                                                            </div>
+                                                            <div class="input-style mb-20">
+                                                                <label>Billing email</label>
+                                                                <input name="billing-email" placeholder="Email you used during checkout" type="email" class="square">
+                                                            </div>
+                                                            <button class="submit submit-auto-width" type="submit">Track</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="card mb-3 mb-lg-0">
+                                                    <div class="card-header">
+                                                        <h5 class="mb-0">My Address</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <%if(data.address){%>
+                                                            <%for(i=0;i<data.address.length;i++){%>
+                                                             
+                                                            <div class="mt-3 mb-3 bg-light p-2 rounded text-dark">
+                                                                <div class="d-flex">
+                                                                  
+                                                                    <small class="me-4">FullName: <%=data.address[i].name%></small>
+                                
+                                                                    <svg class="ms-auto text-dark" style="margin-left: 13rem;" aria-hidden="true" onclick="removeAdress('<%=data._id%>' , '<%=data.address[i]._id%>')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                                                      </svg>
+                                                                    </a>
+                                                                    
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <small class="me-1">Number: <%=data.address[i].number%></small>,
+                                                                    <small>Alt Number: <%=data.address[i].altNumber%></small>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <small>Pincode: <%=data.address[i].pinCode%></small>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <small>House: <%=data.address[i].house%></small>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <small class="me-5">Area: <%=data.address[i].area%></small>
+                                                                    <small>Landmark: <%=data.address[i].landmark%></small>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <small class="me-4">Town: <%=data.address[i].town%></small>
+                                                                    <small class="me-4">State: <%=data.address[i].state%></small>
+                                                                </div>
+                                            
+                                                            </div>
+                                                            <a class="btn btn-info " id="edit" target="__blank" href="/editAdress?id=<%=data.address[i]._id%>">Edit</a>
+                                                            <%}%>
+                                                            <%}%>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-lg-6">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h5 class="mb-0">Shipping Address</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <address>4299 Express Lane<br>
+                                                            Sarasota, <br>FL 34249 USA <br>Phone: 1.941.227.4444</address>
+                                                        <p>Sarasota</p>
+                                                        <a href="#" class="btn-small">Edit</a>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Account Details</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                    <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d=""></path></svg>add address</h6>
+                                                    <span class="text-secondary"> <a href="/addAdress">ADD NEW ADDRESS</a></span>
+                                                  </li>
+                                                <!-- <form action="/addAdress/<%=data._id%>" method="post">
+                                                    <h2>Add ADDRESS</h2>
+                                                  
+                                                    <div class="form-group">
+                                                        <input id="name" type="text" class="form-control" name="name" placeholder="Full Name" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="number"   type="number" class="form-control" name="number" placeholder="Mobile Number" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="altnumber"   type="number" class="form-control" name="altNumber" placeholder="Alternative Number" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="pin-code" type="number" class="form-control" name="pinCode" placeholder="Pin code" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="house"   type="text" class="form-control" name="house" placeholder="Flat, House no., Building, Company, Apartment" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input id="area"   type="text" class="form-control" name="area" placeholder="Area, Street, Sector, Village" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="landmark"   type="text" class="form-control" name="landmark" placeholder="Landmark" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="town"   type="text" class="form-control" name="town" placeholder="Town/city" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input  id="state"   type="text" class="form-control" name="state" placeholder="State" required="required">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <button type="submit" class="btn btn-primary btn-lg">SAVE CHANGES</button>
+                                                        <p id="err-msg"></p>
+                                                    </div>
+                                                </form> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        function removeAdress(userId,addressId){
+            $.ajax({
+                url:'/removeAdd',
+                method:'post',
+                data:{
+                    userId:userId,
+                    addressId:addressId,
+                },
+    
+                success: (response) => {
+                  location.href="/address"
+                }
+            })
+            
+    
+    
+    
+    
+    
+    
+        }
+    </script>
+
+
+    <%- include('../layouts/footer.ejs') %>

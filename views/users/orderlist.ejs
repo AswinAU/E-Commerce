@@ -1,0 +1,141 @@
+<%- include('../layouts/header.ejs') %>
+
+<div class="orderList" style="padding-top: 5rem; padding-bottom: 5rem;">
+
+
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>SL.No</th>
+                    <th>Product Name</th>
+                    <!-- <th> Name</th> -->
+                    <th>Unit-Price</th>
+                    <th>Payment Mode</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th class="text-end"> Action </th>
+                </tr>
+            </thead>
+            <tbody>
+                <%if(locals.orders){%>
+                    <%for(i=0;i<orders.length;i++){%>
+
+                        <tr>
+                            <td>
+                                <%=i+1%>
+                            </td>
+                            <td>
+                                <%=orders[i].ProductDetails[0].name%>
+                            </td>
+                            <!-- <td><b><%=orders[i].address[0].name%></b></td> -->
+                            <td>
+                                ₹<%=orders[i].items.price%>
+                            </td>
+                            <td><span class=" rounded-pill alert-success">
+                                    <%=orders[i].paymentMode%>
+                                </span></td>
+                            <td><span class="rounded-pill alert-success">
+                                    <%=orders[i].orderStatus%>
+                                </span></td>
+                            <td>
+                                <%=orders[i].createdAt.toLocaleString()%>
+                            </td>
+                            <td class="text-end">
+                                <a href="/orderDetail?id=<%=orders[i]._id%>"
+                                    class="btn btn-md rounded font-sm">Detail</a>
+                                <%if(orders[i].orderStatus==' Order cancelled'){%>
+                                    <a class="btn btn-danger" id="<%=orders[i]._id%>" href="#">cancelled</a>
+                                    <%}else{%>
+                                        <a class="btn btn-primary" id="<%=orders[i]._id%>"
+                                            onclick="changeStatus('<%=orders[i]._id%>')" href="#">cancel</a>
+                                        <%}%>
+                                            <!-- <a href="" class="btn btn-md rounded font-sm">cancel</a> -->
+                                            <div class="dropdown">
+                                                <a href="#" data-bs-toggle="dropdown"
+                                                    class="btn btn-light rounded btn-sm font-sm"> <i
+                                                        class="material-icons md-more_horiz"></i> </a>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="">View detail</a>
+                                                    <a class="dropdown-item" href="#">Edit info</a>
+                                                    <a class="dropdown-item text-danger" href="#">Delete</a>
+                                                </div>
+                                            </div> <!-- dropdown //end -->
+                            </td>
+                        </tr>
+                        <% }%>
+                            <% }%>
+                                </td>
+                                </tr>
+            </tbody>
+        </table>
+    </div> <!-- table-responsive //end -->
+</div> <!-- card-body end// -->
+
+<%if(locals.totalpages){%>
+
+    <% if (totalpages> 1) { %>
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <% if (currentpage> 1) { %>
+                        <li class="page-item"><a style="width: 5rem;" class="page-link"
+                                href="/orderlist?id=<%=userData._id%>&page=<%= currentpage - 1 %>">Previous</a>
+                        </li>
+                        <% } %>
+                            <% for (let i=1; i <=totalpages; i++) { %>
+                                <li class="page-item"><a class="page-link"
+                                        href="/orderlist?id=<%=userData._id%>&page=<%= i %>">
+                                        <%= i %>
+                                    </a></li>
+                                <% } %>
+                                    <% if (currentpage < totalpages) { %>
+                                        <li class="page-item active"><a style="width: 5rem;" class="page-link"
+                                                href="/orderlist?id=<%=userData._id%>&page=<%= currentpage + 1 %>">Next</a>
+                                        </li>
+                                        <% } %>
+                </ul>
+            </nav>
+        </div>
+        <% }%>
+            <% }%>
+
+        </div>
+
+
+
+
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                <script>
+                    function changeStatus(orderId) {
+                        $.ajax({
+                            url: '/change-order-status',
+                            method: 'post',
+                            data: {
+                                orderId,
+                                status: ' Order cancelled'
+                            },
+                            success: (response) => {
+
+                                if (response) {
+                                    const cancelButton = document.getElementById(orderId);
+                                    cancelButton.textContent = 'Cancelled';
+                                    cancelButton.classList.remove('btn-primary');
+                                    cancelButton.classList.add('btn-danger');
+
+                                    cancelButton.removeAttribute('onclick');
+                                } else {
+                                    alert('Failed to cancel the order.');
+                                }
+
+                            }
+                        })
+                    }
+                </script>
+
+
+
+
+<%- include('../layouts/footer.ejs') %> 
