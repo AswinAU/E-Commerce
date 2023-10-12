@@ -6,11 +6,10 @@ const otpGenerator = require("otp-generator");
 const session = require("express-session");
 const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
-
-//const adminCategories=require("../view/admin/page-categories");
 const mongoose = require("mongoose");
-
 const mongodb = require("mongodb");
+//const adminCategories=require("../view/admin/page-categories");
+
 
 // load landing-page
 const loadHome = async (req, res, next) => {
@@ -517,51 +516,136 @@ const confirmation = async (req, res, next) => {
         });
 
       res.json({ payment: true, method: "cod", order: order });
+    
+    } else if (order.paymentMode === "online") {
+      console.log("onlineeeeeeeeeeeeeeeeee");
+      const generatedOrder = await generateOrderRazorpay(
+        order._id,
+        order.totalAmount
+      );
+      res.json({
+        payment: false,
+        method: "online",
+        razorpayOrder: generatedOrder,
+        order: order,
+      });
+    } 
+    else if (order.paymentMode === "wallet") {
+      id = req.session.user._id;
+      await user
+        .findByIdAndUpdate(id, { $set: { cart: [] } })
+        .then((data) => {
+          console.log("cart deleted");
+        })
+        .catch((err) => {
+          console.log("cart not deleted");
+        });
+
+      await user
+        .findByIdAndUpdate(id, {
+          $push: {
+            wallet: {
+              amount: Number(-order.totalAmount),
+              timestamp: Date.now(),
+              paymentType: "D",
+            },
+          },
+        })
+        .then((data) => {
+          console.log(data?.wallet);
+        });
+
+      res.json({ payment: true, method: "cod", order: order });
     }
-    // } else if (order.paymentMode === "online") {
-    //   const generatedOrder = await generateOrderRazorpay(
-    //     order._id,
-    //     order.finalAmount
-    //   );
-    //   res.json({
-    //     payment: false,
-    //     method: "online",
-    //     razorpayOrder: generatedOrder,
-    //     order: order,
-    //   });
-    // } 
-    // else if (order.paymentMode === "wallet") {
-    //   id = req.session.user._id;
-    //   await user
-    //     .findByIdAndUpdate(id, { $set: { cart: [] } })
-    //     .then((data) => {
-    //       console.log("cart deleted");
-    //     })
-    //     .catch((err) => {
-    //       console.log("cart not deleted");
-    //     });
-
-    //   await user
-    //     .findByIdAndUpdate(id, {
-    //       $push: {
-    //         wallet: {
-    //           amount: Number(-order.finalAmount),
-    //           timestamp: Date.now(),
-    //           paymentType: "D",
-    //         },
-    //       },
-    //     })
-    //     .then((data) => {
-    //       console.log(data?.wallet);
-    //     });
-
-    //   res.json({ payment: true, method: "cod", order: order });
-    // }
   } catch (err) {
     next(err);
     res.status(500).send("Internal Server Error");
   }
 };
+
+const Razorpay = require("razorpay");
+const { Transaction } = require("mongodb");
+const userModel = require("../model/userModel");
+const { log } = require("console");
+// const { default: items } = require("razorpay/dist/types/items");
+const instance = new Razorpay({
+  key_id: "rzp_test_80jNgNYgTgs47P",
+  key_secret: "Ag95tYV92s1TcaDaz0Ix79A8",
+});
+
+const generateOrderRazorpay = (orderId, total) => {
+  return new Promise((resolve, reject) => {
+    console.log(total,'totallll');
+    const options = {
+      amount: total * 100, // amount in the smallest currency unit
+      currency: "INR",
+      receipt: String(orderId),
+    };
+    instance.orders.create(options, function (err, order) {
+      if (err) {
+        console.log("failed");
+        console.log(err);
+        reject(err);
+      } else {
+        console.log("Order Generated RazorPAY: " + JSON.stringify(order));
+        resolve(order);
+      }
+    });
+  });
+};
+
+
+const verifyRazorpayPayment = (req, res, next) => {
+  try {
+    verifyOrderPayment(req.body)
+      .then(async () => {
+        console.log("Payment SUCCESSFUL");
+        id = req.session.user._id;
+        await user
+          .findByIdAndUpdate(id, { $set: { cart: [] } })
+          .then((data) => {
+            console.log("cart deleted");
+          })
+          .catch((err) => {
+            console.log("cart not deleted");
+          });
+
+        res.json({ status: true });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ status: false, errMsg: "Payment failed!" });
+      });
+  } catch (err) {
+    next(err);
+    res.json({ status: false, errMsg: "Payment failed!" });
+  }
+};
+
+const verifyOrderPayment = (details) => {
+  console.log("DETAILS : " + JSON.stringify(details));
+  return new Promise((resolve, reject) => {
+    const crypto = require("crypto");
+    let hmac = crypto.createHmac("sha256", "Ag95tYV92s1TcaDaz0Ix79A8");
+    hmac.update(
+      details.payment.razorpay_order_id +
+        "|" +
+        details.payment.razorpay_payment_id
+    );
+    hmac = hmac.digest("hex");
+    if (hmac == details.payment.razorpay_signature) {
+      console.log("Verify SUCCESS");
+      resolve();
+    } else {
+      console.log("Verify FAILED");
+      reject();
+    }
+  });
+};
+
+
+
+
 
 const userProfile = async (req, res, next) => {
   try {
@@ -681,7 +765,7 @@ const changeStatus = (req, res, next) => {
     orderModel
       .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
       .then((order) => {
-        // addToWallet(req, res, order.finalAmount, "c");
+         addToWallet(req, res, order.totalAmount, "c");
         console.log(order);
         res.json(true);
       })
@@ -694,6 +778,45 @@ const changeStatus = (req, res, next) => {
     res.json(false);
   }
 };
+
+const addToWallet = async (req, res, amount, transactionType) => {
+  var id = req.session.user._id;
+  console.log(id);
+
+  await user
+    .findByIdAndUpdate(id, {
+      $push: {
+        wallet: { amount: Number(amount), paymentType: transactionType },
+      },
+    })
+    .then((data) => {
+      console.log(data?.wallet);
+    });
+};
+
+//wallet
+const wallet = (req,res,next)=>{
+  try{
+    const userId = req.session.user._id;
+    console.log(userId);
+    user.findById(userId).then((data) => {
+      data.wallet.reverse();
+
+      const itemsperpage = 5;
+      const currentpage = parseInt(req.query.page) || 1;
+      const startindex = (currentpage - 1) * itemsperpage;
+      const endindex = startindex + itemsperpage;
+      const totalpages = Math.ceil(data.wallet.length / 5);
+      const currentproduct = data.wallet.slice(startindex, endindex);
+      console.log("Current products : ", currentproduct);
+
+      console.log(totalpages);
+      res.render("wallet", {log: req.session.isLoggedIn, data: currentproduct, totalpages, currentpage });
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 
@@ -724,4 +847,6 @@ module.exports = {
   ShowOrders,
   orderDetails,
   changeStatus,
+  wallet,
+  verifyRazorpayPayment,
 };

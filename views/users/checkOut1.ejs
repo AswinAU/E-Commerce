@@ -1,5 +1,7 @@
 <%- include('../layouts/header.ejs') %>
-
+<head>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
 
     <div class="order_box container mt-5 ml-auto ">
         <h2 class="mb-4">Checkout</h2>
@@ -83,12 +85,26 @@
                             <div class="radion_btn">
                                 <input type="radio" id="f-option5" name="selector" value="cod" checked>
                                 <label for="f-option5">Cash on Delivery</label>
+                                <p>you can also complete payment using online payment methods during
+                                    delivery time.</p>
                                 <div class="check"></div>
+                                <input type="radio" name="selector" id="wallet" value="wallet">
+                                        <li><a href="#">Wallet Balance <span>
+                                                    <%if(locals.data[0]){%>
+                                                        <% var totalAmount=0; %>
+                                                            <%for(i=0;i<data[0].wallet.length;i++){%>
+
+                                                                <% totalAmount +=data[0].wallet[i].amount; %>
+
+                                                                    <%}%>
+                                                                        <div class="mt-2">₹ <%= totalAmount %>
+                                                                        </div>
+                                                                        <%}%>
+                                                </span></a></li>
                             </div>
-                            <p>you can also complete payment using online payment methods during
-                                delivery time.</p>
+                            
                         </div>
-                        <!-- <div class="payment_item active">
+                        <div class="payment_item active">
                             <div class="radion_btn">
                                 <input type="radio" id="f-option6" name="selector" value="online" checked>
                                 <label for="f-option6">Online Payment </label>
@@ -98,7 +114,7 @@
                             <p>Pay via online; you can pay with your credit card ,debit card or UPI
                                 payments
                                 .</p>
-                        </div> -->
+                        </div>
                         <!-- <div class="creat_account">
                             <input type="checkbox" id="f-option4" name="selector">
                             <label for="f-option4">I’ve read and accept the </label>
@@ -200,17 +216,17 @@
                     console.log(addressId);
                     // let payment = $(".radio:checked").val();
                     let codbutton = document.getElementById("f-option5")
-                    // let onlinebutton = document.getElementById("f-option6")
-                    // let walletbutton = document.getElementById("wallet")
+                    let onlinebutton = document.getElementById("f-option6")
+                    let walletbutton = document.getElementById("wallet")
                     let payment
                     if (codbutton.checked) {
                         payment = codbutton.value
+                    
+                    } else if (onlinebutton.checked) {
+                        payment = onlinebutton.value
+                    } else if (walletbutton.checked) {
+                        payment = walletbutton.value
                     }
-                    // } else if (onlinebutton.checked) {
-                    //     payment = onlinebutton.value
-                    // } else if (walletbutton.checked) {
-                    //     payment = walletbutton.value
-                    // }
                     console.log(payment);
                     $.ajax({
                         url: '/confirmation',
@@ -242,38 +258,38 @@
                                             location.href = '/Shop'
                                         }
                                     });
-                                }
+                                
 
-                            // } else if (response.method == 'online') {
-                            //     var options = {
-                            //         "key": "rzp_test_80jNgNYgTgs47P", // Enter the Key ID generated from the Dashboard
-                            //         "amount": response.order.finalAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                            //         "currency": "INR",
-                            //         "name": "SHOE CART", //your business name
-                            //         "description": "Test Transaction",
-                            //         "image": "https://example.com/your_logo",
-                            //         "order_id": response.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                            //         "handler": function (status) {
+                            } else if (response.method == 'online') {
+                                var options = {
+                                    "key": "rzp_test_80jNgNYgTgs47P", // Enter the Key ID generated from the Dashboard
+                                    "amount": response.order.finalAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                                    "currency": "INR",
+                                    "name": "Evara", //your business name
+                                    "description": "Test Transaction",
+                                    "image": "https://example.com/your_logo",
+                                    "order_id": response.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                                    "handler": function (status) {
 
-                            //             verifyPayment(response, status)
-                            //         },
-                            //         "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
-                            //             "name": "Gaurav Kumar", //your customer's name
-                            //             "email": "gaurav.kumar@example.com",
-                            //             "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
-                            //         },
-                            //         "notes": {
-                            //             "address": "Razorpay Corporate Office"
-                            //         },
-                            //         "theme": {
-                            //             "color": "#3399cc"
-                            //         }
-                            //     };
-                            //     var rzp1 = new Razorpay(options);
-                            //     rzp1.open();
+                                        verifyPayment(response, status)
+                                    },
+                                    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                                        "name": "Gaurav Kumar", //your customer's name
+                                        "email": "gaurav.kumar@example.com",
+                                        "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                                    },
+                                    "notes": {
+                                        "address": "Razorpay Corporate Office"
+                                    },
+                                    "theme": {
+                                        "color": "#3399cc"
+                                    }
+                                };
+                                var rzp1 = new Razorpay(options);
+                                rzp1.open();
 
 
-                            // } 
+                            } 
                             else {
                                 Swal.fire({
                                     title: 'Error Occured',
@@ -291,4 +307,67 @@
 
 
             }
+
+
+            function verifyPayment(order, payment) {
+            $.ajax({
+                url: '/verifyPayment',
+                method: 'post',
+                data: {
+                    order,
+                    payment
+                },
+                success: (response) => {
+                    if(response.method == 'online'){
+                        alert("Razorpayyy")
+                        var options = {
+            "key": "rzp_test_8ibpvP8EYnRKl4", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Evara",
+            "description": "Test Transaction",
+            "image": "http://localhost:3000/images/logo.png",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                verifyPayment(response, order);
+            },
+            "prefill": {
+                "name": "Evara",
+                "email": "cycleshop@gmail.com",
+                "contact": "8089568695"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+
+                    }
+                    if (response.status) {
+                        Swal.fire({
+                            title: "Order success",
+                            text: "order placed successfully",
+                            icon: "success",
+                            showCancelButton: true,
+                            confirmButtonText: "view orders",
+                            cancelButtonText: "continue shopping",
+                            reverseButtons: true
+                        })
+                        .then(function (result) {
+                            if (result.value) {
+                        location.href = '/Account'
+                            } else if (result.dismiss === "cancel") {
+                                location.href = '/productList'
+                            }
+                        });
+                    } else {
+                        alert("Payment failed!" + response.errMsg)
+                    }
+                }
+            })
+        }
         </script>

@@ -81,6 +81,9 @@ user_route.get("/orderlist", userController.ShowOrders)
 user_route.get("/orderDetail", userController.orderDetails)
 user_route.post("/change-order-status", userController.changeStatus)
 
+//wallet
+user_route.get("/wallet",auth.isLogin,userController.wallet)
+user_route.post("/verifyPayment", userController.verifyRazorpayPayment)
 
 
 
