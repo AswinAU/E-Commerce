@@ -19,207 +19,109 @@
                                 <tr>
                                     <th scope="col">Product</th>
                                     <th scope="col">Price</th>
-                                    <th scope="col">Quantity</th>
+                                    <th scope="col" style="width: 250px;">Quantity</th>
                                     <th scope="col">Total</th>
-    
+                                    <th scope="col">Action</th>
+
                                 </tr>
                             </thead>
                             <tbody>
                                 <%if(locals.cart){%>
                                     <%for(i=0;i<cart.length;i++){%>
                                         <tr>
-    
                                             <td>
-    
                                                 <div class="media">
-    
-                                                    <div class="d-flex">
-    
-                                                        <img src="/upload/product/<%= cart[i]?.ProductDetails[0]?.images[i] %>"
-                                                            style="height: 100px; width: 100px;" alt="">
-                                                    </div>
+                                                    <img src="/upload/product/<%= cart[i]?.ProductDetails[0]?.images[i] %>"
+                                                        style="height: 100px; width: 100px;" alt="">
                                                     <div class="media-body">
                                                         <p>
                                                             <%=cart[i]?.ProductDetails[0]?.name%>
                                                         </p>
-    
+
                                                     </div>
-    
+
                                                 </div>
                                                 <br><br><br>
-    
+
                                             </td>
                                             <td>
                                                 <h5 id="<%=cart[i]?.ProductDetails[0]?._id%>price">
                                                     <%=cart[i]?.ProductDetails[0]?.sale_price%>
                                                 </h5>
                                             </td>
-    
-    
+
+
                                             <td>
-                                                <div class="col-md-4 col-6 mb-3">
-                                                    <!-- <label class="mb-2 d-block">Quantity</label> -->
-                                                    <!-- <div class="input-group mb-3" style="width: 170px;">
-                                                        <button class="btn btn-white border border-secondary px-3"
-                                                            type="button" id="decrementButton" data-mdb-ripple-color="dark"
-                                                            onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,-1)">
-                                                            -
-                                                        </button>
-                                                        <input name="quantity" type="text"
-                                                            id="<%=cart[i]?.ProductDetails[0]?._id%>"
-                                                            class="form-control text-center border border-secondary item-quantity"
-                                                            value="<%=cart[i]?.quantity%>"
-                                                            aria-label="Example text with button addon"
-                                                            aria-describedby="decrementButton" />
-                                                        <button class="btn btn-white border border-secondary px-3"
-                                                            type="button" id="incrementButton" data-mdb-ripple-color="dark"
-                                                            onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,1)">
-                                                            +
-                                                        </button>
-                                                    </div> -->
-    
-    
-                                                    <div class="input-group mb-3" style="width: 170px;">
-                                                        <button class="btn btn-white border border-secondary px-3"
-                                                            type="button" id="decrementButton" data-mdb-ripple-color="dark"
-                                                            onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,-1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
-                                                            -
-                                                        </button>
-                                                        <input name="quantity" type="text"
-                                                            id="<%=cart[i]?.ProductDetails[0]?._id%>"
-                                                            class="form-control text-center border border-secondary item-quantity"
-                                                            value="<%=cart[i]?.quantity%>"
-                                                            aria-label="Example text with button addon"
-                                                            aria-describedby="decrementButton" readonly />
-                                                        <!-- Add readonly attribute here -->
-                                                        <button class="btn btn-white border border-secondary px-3"
-                                                            type="button" id="incrementButton" data-mdb-ripple-color="dark"
-                                                            onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
-                                                            +
-                                                        </button>
-                                                    </div>
-    
-                                                    <div class="mt-4">
-                                                        <!-- <p>Size:</p> -->
-                                                    </div>
+
+                                                <div class="input-group mb-3" style="width: 170px;">
+                                                    <button class="btn btn-white border border-secondary px-3"
+                                                        type="button" id="decrementButton" data-mdb-ripple-color="dark"
+                                                        onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,-1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
+                                                        -
+                                                    </button>
+                                                    <input name="quantity" type="text"
+                                                        id="<%=cart[i]?.ProductDetails[0]?._id%>"
+                                                        class="form-control text-center border border-secondary item-quantity"
+                                                        value="<%=cart[i]?.quantity%>"
+                                                        aria-label="Example text with button addon"
+                                                        aria-describedby="decrementButton" readonly />
+                                                    <!-- Add readonly attribute here -->
+                                                    <button class="btn btn-white border border-secondary px-3"
+                                                        type="button" id="incrementButton" data-mdb-ripple-color="dark"
+                                                        onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
+                                                        +
+                                                    </button>
                                                 </div>
                                             </td>
-    
+
                                             <td>
-                                                <h5 id="<%=cart[i]?.ProductDetails[0]?._id%>pro-total" class="item-total">
+                                                <h5 id="<%=cart[i]?.ProductDetails[0]?._id%>pro-total"
+                                                    class="item-total">
                                                     <%=parseInt(cart[i]?.ProductDetails[0]?.sale_price)*parseInt(cart[i]?.quantity)%>
                                                 </h5>
                                             </td>
-    
-                                            <td> <button
-                                                    type="button" onclick="removeFromCart('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>')"
+
+                                            <td> <button type="button"
+                                                    onclick="removeFromCart('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>')"
                                                     class="btn btn-primary">Delete</button></td>
-    
-    
                                         </tr>
                                         <%}%>
                                             <%}%>
                                                 <tr>
-    
-                                                <tr class="bottom_button">
-                                                    <td>
-                                                        <!-- <a class="gray_btn" href="#">Update Cart</a> -->
-                                                    <th scope="col"></th>
-                                                    </td>
-                                                    <td>
-    
-                                                    </td>
-                                                    <td>
-    
-                                                    </td>
-                                                    <td>
-                                                        <!-- <div class="cupon_text d-flex align-items-center ">
-                                                            <input type="text" placeholder="Coupon Code">
-                                                            <a class="primary-btn" href="#">Apply</a>
-                                                             <a class="gray_btn" href="#">Close Coupon</a> -->
-                                                        <!-- </div>  -->
-                                                    </td>
-                                                </tr>
                                                 <tr>
-                                                    <td>
-    
-    
-    
-                                                    </td>
-                                                    <td>
-    
-                                                    </td>
-                                                    <td>
-                                                        <!-- <h5>Subtotal</h5> -->
-                                                    </td>
-                                                    <td>
-    
-                                                        <h5>Cart Total ₹:<span id="final-amount">
-                                                                <%if(locals.total){%>
-                                                                    <%=total%>
-                                                                        <%}%>
-                                                            </span></h5>
-                                                    </td>
+                                                    <td colspan="3"></td>
+                                        <td class="cart-total">
+                                            <strong>Cart Total</strong> ₹<span id="final-amount">
+                                                <%if(locals.total){%>
+                                                    <%=total%>
+                                                <%}%>
+                                            </span>
+                                        </td>
+                                        <td></td>
                                                 </tr>
-                                                <!-- <tr class="shipping_area">
-                                    <td>
-    
-                                    </td>
-                                    <td>
-    
-                                    </td>
-                                    <td>
-                                        <h5>Shipping</h5>
-                                    </td>
-                                    <td>
-                                        <div class="shipping_box">
-                                            <ul class="list">
-    
-                                                <li><a href="#">cash ondelivery</a></li>
-                                                <li><a href="#">upi</a></li>
-                                                <li><a href="#">debit card</a></li>
-                                                 <li class="active"><a href="#">Local Delivery: $2.00</a></li> -->
-                                                </ul>
-                                                <!-- <h6>Calculate Shipping <i class="fa fa-caret-down" aria-hidden="true"></i></h6>
-                                            <select class="shipping_select">
-                                                <option value="1">Bangladesh</option>
-                                                <option value="2">India</option>
-                                                <option value="4">Pakistan</option>
-                                            </select>
-                                            <select class="shipping_select">
-                                                <option value="1">Select a State</option>
-                                                <option value="2">Select a State</option>
-                                                <option value="4">Select a State</option>
-                                            </select>
-                                            <input type="text" placeholder="Postcode/Zipcode">
-                                            <a class="gray_btn" href="#">Update Details</a> -->
+                                               
+                                                
                     </div>
                     </td>
                     </tr>
-                    
+
                     </tbody>
                     </table>
-    
+
                 </div>
-    
+
                 <div class="row justify-content-center">
                     <div class="col-lg-4 ">
-    
+
                         <div class="checkout_btn_inner col-8 col-lg-9 col-md-4 ">
-                            <!-- <a class="gray_btn" href="#">Continue Shopping</a> -->
-                            <!-- <a class="primary-btn" href="/check-out">Proceed to checkout</a> -->
                             <form action="/check-out" method="post">
                                 <input type="hidden" name="total" <%if(locals.total){%> value="<%=total%>"<%}%>>
-    
-    
-                                        <button type="submit" class="btn btn-success w-100 shadow-0 mb-2"> proceed to
-                                            checkout</button>
-                                        <a href="/Shop" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+                                <button type="submit" class="btn btn-success w-100 shadow-0 mb-2"> proceed to checkout</button>      
                             </form>
                         </div>
-    
-    
-    
+
+
+
                     </div>
                 </div>
             </div>
@@ -234,9 +136,9 @@
         function changeQuantity(userId, proId, count, quantity) {
 
             const qty = document.getElementById(proId)
-            
+
             if (qty.value > 1 || count == 1) {
-                
+
                 if (parseInt(qty.value) + 1 > quantity && count == 1) {
                     Swal.fire({
                         title: 'STOCK!',
@@ -246,7 +148,7 @@
                     })
                 } else {
 
-                    
+
                     qty.value = Number(qty.value) + count
 
                     const sub = document.getElementById(`${proId}pro-total`)

@@ -1,7 +1,7 @@
 const express = require("express");
 const config = require("../config/config");
 const session = require("express-session");
-const bodyparser = require("body-parser");
+// const bodyparser = require("body-parser");
 const adminController = require("../controllers/adminController");
 const auth = require("../middleware/adminAuth");
 const valid = require('../middleware/imageValidation');
@@ -9,15 +9,16 @@ const categoryController = require("../controllers/categoryControler");
 const categoryUpload = require("../multer/category-multer");
 const productController = require("../controllers/productController");
 const productUpload = require("../multer/product-upload");
-
+const { route } = require("./userRoute");
+const errorHandler= require('../middleware/errorhandler')
 
 const admin_route = express();
 admin_route.use(session({ secret: config.sessionSecret }));
 
 admin_route.use(express.static("public"));
 
-admin_route.use(bodyparser.json());
-admin_route.use(bodyparser.urlencoded({ extended: true }));
+admin_route.use(express.json());
+admin_route.use(express.urlencoded({ extended: true }));
 
 admin_route.set("view engine", "ejs");
 admin_route.set("views", "./views/admin");
@@ -66,12 +67,18 @@ admin_route.get("/delete-product/:id", auth.isLogin,productController.deleteProd
 
 //users list
 admin_route.get("/userslist", auth.isLogin,adminController.userslist);
-admin_route.get("/block-user", auth.isLogin,adminController.blockUser);
-admin_route.get("/unblock-user", auth.isLogin,adminController.unblockUser);
+admin_route.post("/block-user", auth.isLogin,adminController.blockUser);
+admin_route.post("/unblock-user", auth.isLogin,adminController.unblockUser);
 
 //orders
 admin_route.get("/order-list", auth.isLogin,adminController.ShowOrders);
 admin_route.get("/order-detail/:id", auth.isLogin,adminController.orderDetail)
 admin_route.post("/change-order-status", auth.isLogin,adminController.changeStatus)
 
+//coupens
+admin_route.get("/add-Coupon", auth.isLogin,adminController.addcoupon);
+admin_route.post('/addcoupon', auth.isLogin,adminController.addcouponpost);
+
+
+admin_route.use(errorHandler)
 module.exports = admin_route;

@@ -3,31 +3,68 @@ const bcrypt = require("bcrypt");
 const categoryModel = require("../model/category-model");
 const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
+const couponModel = require("../model/coupon");
 const mongodb = require("mongodb");
 
 //login page
 const loadLogin = async (req, res, next) => {
   try {
-    res.render("adminLogin");
+    res.render("adminLogin", { message: false });
   } catch (err) {
     next(err);
   }
 };
 
 // login verification
+// const verifyLogin = async (req, res, next) => {
+//   try {
+//     const email = req.body.email;
+//     const password = req.body.password;
+//     const userData = await user.findOne({ email: email, is_admin: 1 });
+//     console.log(userData);
+//     if (userData) {
+//       const passwordMatch = await bcrypt.compare(password, userData.password);
+
+//       if (passwordMatch) {
+//         if (userData.is_admin == 0) {
+//           res.render("adminLogin", {
+//             message: "email and password is incorrect",
+//           });
+//         } else {
+//           req.session.user_id = userData._id;
+//           res.redirect("/admin/adminHome");
+//         }
+//       } else {
+//         res.render("adminLogin", {
+//           message: "email and password is incorrect",
+//         });
+//       }
+//     } else {
+//       res.render("adminLogin", { message: "email and password is incorrect" });
+//     }
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 const verifyLogin = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
     const userData = await user.findOne({ email: email, is_admin: 1 });
-    console.log(userData);
+
     if (userData) {
+      // Validate password (either all numbers or all letters, at least 8 characters)
+      const passwordRegex = /^(?:\d+|[a-zA-Z]+){8,}$/;
+      if (!password.match(passwordRegex)) {
+        return res.render("adminLogin", { message: "Invalid password format" });
+      }
+
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
       if (passwordMatch) {
         if (userData.is_admin == 0) {
           res.render("adminLogin", {
-            message: "email and password is incorrect",
+            message: "Email and password are incorrect",
           });
         } else {
           req.session.user_id = userData._id;
@@ -35,16 +72,17 @@ const verifyLogin = async (req, res, next) => {
         }
       } else {
         res.render("adminLogin", {
-          message: "email and password is incorrect",
+          message: "Email and password are incorrect",
         });
       }
     } else {
-      res.render("adminLogin", { message: "email and password is incorrect" });
+      res.render("adminLogin", { message: "Email and password are incorrect" });
     }
   } catch (err) {
     next(err);
   }
 };
+
 
 // Dashboard load
 const loadDashboard = async (req, res, next) => {
@@ -81,25 +119,38 @@ const userslist = async (req, res, next) => {
 //block-user
 const blockUser = async (req, res, next) => {
   try {
-    id = req.query.id;
-    await user.findByIdAndUpdate(id, { is_verified: 1 });
-    res.redirect("/admin/usersList");
+    const { userId } = req.body; // Extract userId from request body
+    console.log(userId, 'User ID');
+    
+    // Assuming `user` is your Mongoose model, make sure to pass `userId` as an ObjectId
+    // Update the user's verification status in the database
+    await user.findByIdAndUpdate(userId, { is_verified: 0 });
+    
+    res.status(200).send('User blocked successfully'); // Send a success response back to the client
   } catch (err) {
-    next(err);
+    console.error('Error blocking user:', err);
+    res.status(500).send('Internal Server Error'); // Send an error response back to the client
   }
 };
+
 
 // unblock-user
 const unblockUser = async (req, res, next) => {
   try {
-    console.log("heloo");
-    id = req.query.id;
-    await user.findByIdAndUpdate(id, { is_verified: 0 });
-    res.redirect("/admin/usersList");
+    const { userId } = req.body; // Extract userId from request body
+    console.log(userId, 'User ID');
+
+    // Assuming `user` is your Mongoose model, make sure to pass `id` as an ObjectId
+    // Update the user's verification status in the database
+    await user.findByIdAndUpdate(userId, { is_verified: 1 });
+
+    res.status(200).send('User unblocked successfully'); // Send a success response back to the client
   } catch (err) {
-    next(err);
+    console.error('Error unblocking user:', err);
+    res.status(500).send('Internal Server Error'); // Send an error response back to the client
   }
 };
+
 
 
 // orders listing in admin side
@@ -203,6 +254,40 @@ const changeStatus = (req, res, next) => {
   }
 };
 
+//coupen
+const addcoupon = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    couponModel.find({}).then((data) => {
+      data.reverse();
+      const itemsperpage = 3;
+      const currentpage = parseInt(req.query.page) || 1;
+      const startindex = (currentpage - 1) * itemsperpage;
+      const endindex = startindex + itemsperpage;
+      const totalpages = Math.ceil(data.length / 3);
+      const currentproduct = data.slice(startindex, endindex);
+      res.render("addcoupon", {
+        data: currentproduct,
+        totalpages,
+        currentpage,
+      });
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const addcouponpost = async (req, res, next) => {
+  console.log("kkkkkkkkkkkkkkkkkkkkkkkkkk");
+  try {
+    console.log(req.body);
+    let coupon = req.body;
+    await couponModel.create(coupon);
+    res.redirect("back");
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
   loadLogin,
@@ -215,4 +300,6 @@ module.exports = {
   ShowOrders,
   orderDetail,
   changeStatus,
+  addcoupon,
+  addcouponpost,
 };

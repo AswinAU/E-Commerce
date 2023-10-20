@@ -46,9 +46,7 @@
                     <div class="heading_s1">
                         <h3 class="mb-30">Login</h3>
                     </div>
-                    <% if (message) { %>
-                      <h5 style="color: red;"><%= message %></h5>
-                    <% } %>
+                    
                     <form action="/login" method="post">
                         <div class="form-group">
                             <input type="text" required="" name="email" placeholder="Your Email">
@@ -56,6 +54,9 @@
                         <div class="form-group">
                             <input required="" type="password" name="password" placeholder="Password">
                         </div>
+                        <% if (message) { %>
+                          <h5 style="color: red;"><%= message %></h5>
+                        <% } %>
                         <div class="login_footer form-group">
                             <div class="chek-form">
                                 <div class="custome-checkbox">
@@ -69,6 +70,7 @@
                             <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
                         </div>
                     </form>
+                    
                     <div class="text-muted text-center">New here? C'mon Sign Up <a href="/register">Sign up Now</a></div>
                 </div>
             </div>

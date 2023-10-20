@@ -130,12 +130,12 @@ showAddProduct: async (req, res, next) => {
             quantity: req.body.quantity,
             size: size,
             category: req.body.category,
-            images: [
-              req.files[0].filename,
-              req.files[1].filename,
-              req.files[2].filename,
-              req.files[3].filename,
-            ],
+            // images: [
+            //   req.files[0].filename,
+            //   req.files[1].filename,
+            //   req.files[2].filename,
+            //   req.files[3].filename,
+            // ],
           },
           { new: true }
         );

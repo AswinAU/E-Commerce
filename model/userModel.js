@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
       type: Array
 
    },
+   whishlist: {
+      type: Array
+   },
    address:
       [{
          name: { type: String },

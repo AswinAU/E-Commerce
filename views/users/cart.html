@@ -1,0 +1,210 @@
+<%- include('../layouts/header.ejs') %>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index-2.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="cart_area">
+            <div class="container">
+                <div class="cart_inner">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col" style="width: 250px;">Quantity</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if(locals.cart){ %>
+                                    <% for(let i=0;i<cart.length;i++){%>
+                                        <tr>
+                                            <td>
+                                                <div class="media">
+                                                    <img src="/upload/product/<%= cart[i]?.ProductDetails[0]?.images[i] %>"
+                                                        style="height: 100px; width: 100px;" alt="">
+                                                    <div class="media-body">
+                                                        <p><%= cart[i]?.ProductDetails[0]?.name %></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>₹<%= cart[i]?.ProductDetails[0]?.sale_price %></td>
+                                            <td>
+                                                <div class="input-group mb-3" style="width: 170px;">
+                                                    <button class="btn btn-white border border-secondary px-3"
+                                                        type="button" id="decrementButton" data-mdb-ripple-color="dark"
+                                                        onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,-1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
+                                                        -
+                                                    </button>
+                                                    <input name="quantity" type="text"
+                                                        id="<%=cart[i]?.ProductDetails[0]?._id%>"
+                                                        class="form-control text-center border border-secondary item-quantity"
+                                                        value="<%=cart[i]?.quantity%>"
+                                                        aria-label="Example text with button addon"
+                                                        aria-describedby="decrementButton" readonly />
+                                                    <!-- Add readonly attribute here -->
+                                                    <button class="btn btn-white border border-secondary px-3"
+                                                        type="button" id="incrementButton" data-mdb-ripple-color="dark"
+                                                        onclick="changeQuantity('<%=cart[i]?._id%>' , '<%=cart[i]?.proId%>' ,1,' <%=cart[i]?.ProductDetails[0]?.quantity%>')">
+                                                        +
+                                                    </button>
+                                                </div>
+    
+                                                </td>
+                                                <td>₹<span id="<%= cart[i]?.ProductDetails[0]?._id %>pro-total"><%= parseInt(cart[i]?.ProductDetails[0]?.sale_price) * parseInt(cart[i]?.quantity) %></span>
+                                                </td>
+                                                <td>
+                                                    <button type="button"
+                                                        onclick="removeFromCart('<%= cart[i]?._id %>', '<%= cart[i]?.proId %>')"
+                                                        class="btn btn-danger">Remove</button>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } %>
+                                    <tr>
+                                        <td colspan="3"></td>
+                                        <td class="cart-total">
+                                            <strong>Cart Total</strong> ₹<span id="final-amount">
+                                                <%if(locals.total){%>
+                                                    <%=total%>
+                                                <%}%>
+                                            </span>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4">
+                            <div class="checkout-btns">
+                                <form action="/check-out" method="post">
+                                    <input type="hidden" name="total" <% if(locals.total){%> value="<%=total%>" <%}%>>
+                                    <button type="submit" class="btn btn-success btn-block mb-3">Proceed to Checkout</button>
+                                </form>
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        function changeQuantity(userId, proId, count, quantity) {
+
+            const qty = document.getElementById(proId)
+            
+            if (qty.value > 1 || count == 1) {
+                
+                if (parseInt(qty.value) + 1 > quantity && count == 1) {
+                    Swal.fire({
+                        title: 'STOCK!',
+                        text: 'Product is out of stock.',
+                        icon: 'error',
+                        timer: 5000
+                    })
+                } else {
+
+                    
+                    qty.value = Number(qty.value) + count
+
+                    const sub = document.getElementById(`${proId}pro-total`)
+                    const subPrice = document.getElementById(`${proId}price`)
+                    sub.textContent = qty.value * subPrice.textContent
+
+
+
+
+                    const items = document.querySelectorAll(".item-total")
+                    const final = document.querySelector("#final-amount")
+                    let amt = 0
+                    items.forEach(item => {
+                        amt += Number(item.innerText)
+                    })
+                    final.innerText = amt
+
+
+
+                    let quantity = qty.value - count
+
+                    $.ajax({
+                        url: "/change-quantity",
+                        method: 'post',
+                        data: {
+                            userId: userId,
+                            proId: proId,
+                            count: count,
+                            quantity: quantity,
+                        },
+                        success: (response) => {
+                            console.log(response.status)
+
+                            if (response.status == true) {
+                                location.reload();
+                            } else {
+                                let total = parseInt(quantity) + parseInt(count);
+                                document.getElementById(proId).value = total;
+
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    </script>
+
+    <script>
+        function removeFromCart(userId, proId) {
+            console.log('removeFromCart')
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/removeFromCart',
+                        method: 'post',
+                        data: {
+                            userId: userId,
+                            proId: proId,
+                        },
+                        success: (response) => {
+                            if (response == true) {
+                                location.reload()
+                            } else {
+                                location.reload()
+                            }
+
+                        }
+                    })
+
+
+                }
+            })
+        }
+    </script>
+
+
+    <%- include('../layouts/footer.ejs') %>

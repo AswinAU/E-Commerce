@@ -3,26 +3,26 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
-    <div class="order_box container mt-5 ml-auto ">
+    <div class="order_box container mt-5 ml-auto " style="
+    padding: 20px;" >
         <h2 class="mb-4">Checkout</h2>
         
         <div class="billing_details">
             <div class="row">
 
                 <div class="col-md-6 ">
-                    <div>
+                    <div style="padding: 15px;">
                         <%if(locals.data){%>
                             <h5>Shipping Address</h5>
                             <%for(i=0;i<data[0].address.length;i++){%>
-                                <input type="radio" id="addressselect" name="addressselect"
+                                
+                                <div class="mt-3 mb-3 bg-light p-2 rounded text-dark">
+                                    <input type="radio" id="addressselect" name="addressselect"
                                     value="<%=data[0].address[i]._id%>">
-
-                                    <svg class="ms-auto text-dark" style="margin-left: 13rem;" aria-hidden="true" onclick="removeAdress('<%=data._id%>' , '<%=data[0].address[i]._id%>')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                    <svg class="ms-auto text-dark" style="margin-bottom: 0.5rem;" aria-hidden="true" onclick="removeAdress('<%=data._id%>' , '<%=data[0].address[i]._id%>')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                         <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
                                       </svg>
                                     </a>
-
-                                <div class="mt-3 mb-3 bg-light p-2 rounded text-dark">
                                     <div class="d-flex">
                                         <small class="me-4">FullName: <%=data[0].address[i].name%></small>
                                     </div>
@@ -63,7 +63,7 @@
                 <div class="col-md-6 ml-auto">
                     <div class="order_box">
                         <h2>Your Order</h2>
-                        <ul class="list list_2">
+                        <ul class="list list_2" style="padding-left: 10px;">
                             <%if(locals.total){%>
                                 <li><a href="#">Subtotal <span id="discount2">
                                             <%=total%>
@@ -104,6 +104,27 @@
                             </div>
                             
                         </div>
+                        <button type="button" class="btn btn-outline-primary mt-2"
+                                            data-bs-toggle="modal" data-bs-target="#modalCoupon">Available
+                                            Coupons</button>
+                                        <div class="cupon_text d-flex ml-auto" style="padding-left: 45%;">
+                                            <input type="text" placeholder="Coupon Code" id="coupon">
+                                            <button class="primary-btn" onClick="coupon('<%=total%>')" href="#">Apply</button>
+
+
+                                        </div>
+                                        <li><a href="#">coupon discount <span>
+                                                    <div id="discountAmount">
+                                                        0
+                                                    </div>
+                                                </span></a></li>
+
+                                        <li><a href="#">Total <span id="amounts">
+                                                    <%if(locals.total){%>
+                                                        <%=total%>
+                                                </span></a></li>
+                                        <%}%>
+                                        <input type="hidden" value="<%=total%>">
                         <div class="payment_item active">
                             <div class="radion_btn">
                                 <input type="radio" id="f-option6" name="selector" value="online" checked>
@@ -132,6 +153,46 @@
         </div>
         
     </div>
+
+    <div class="modal fade top" id="modalCoupon" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
+    data-bs-backdrop="true">
+    <div class="modal-dialog modal-frame modal-top modal-notify modal-success" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Body-->
+            <div class="modal-body">
+                <% coupons.forEach((coupon, index)=> { %>
+                    <div class="row d-flex justify-content-center align-items-center border rounded">
+                        <div class="col-12 col-md-12 d-flex">
+                            <div class="code-container col-3 col-md-3 d-flex align-items-center">
+                                <p>
+                                    <span class="badge" id="couponCode<%= index %>" style="color: black;">
+                                        <%= coupon.code %>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="content-copy-container col-9 col-md-9 d-flex align-items-center">
+                                <p class="pt-3 mx-4">
+                                    <%= coupon.description %>
+                                        <strong> &#8377;<%= coupon.discountAmount %> discount</strong>.
+                                </p>
+                                <button type="button" class="btn btn-success copy-button ms-auto"
+                                    data-index="<%= index %>">
+                                    <i class="fas fa-copy ml-1 white-text ">Copy</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                        <div class="close-container d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">happy,
+                                shopping</button>
+                        </div>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
 
 
 
@@ -180,6 +241,7 @@
 
     <%- include('../layouts/footer.ejs') %>
 
+
         <script>
             function removeAdress(userId, addressId) {
                 $.ajax({
@@ -200,174 +262,229 @@
         </script>
 
         <script>
-            function makePurchase(GrandTotal) {
+            document.addEventListener("DOMContentLoaded", function () {
+            const copyButtons = document.querySelectorAll(".copy-button");
+            copyButtons.forEach(copyButton => {
+                copyButton.addEventListener("click", function () {
+                    const couponCode = this.closest(".row").querySelector(".badge").textContent.trim();
+                    copyToClipboard(couponCode);
+                    updateCopyButton(this); // Update the clicked copy button's appearance
+                    const modal = document.getElementById('modalCoupon');
+                    const modalInstance = bootstrap.Modal.getInstance(modal);
+                    modalInstance.hide(); // Close the modal after copying
+                });
+            });
+        });
 
+        function updateCopyButton(button) {
+            button.innerHTML = '<i class="fas fa-check ml-1 white-text"></i>';
+            button.disabled = true; // Disable the button after copying
+        }
 
-                let addressId = $("#addressselect:checked").val();
-                if (!addressId) {
-                    Swal.fire({
-                        title: "select address",
-                        text: "",
-                        icon: "error",
-                        timer: 2000
-                    })
-                } else {
-
-                    console.log(addressId);
-                    // let payment = $(".radio:checked").val();
-                    let codbutton = document.getElementById("f-option5")
-                    let onlinebutton = document.getElementById("f-option6")
-                    let walletbutton = document.getElementById("wallet")
-                    let payment
-                    if (codbutton.checked) {
-                        payment = codbutton.value
-                    
-                    } else if (onlinebutton.checked) {
-                        payment = onlinebutton.value
-                    } else if (walletbutton.checked) {
-                        payment = walletbutton.value
-                    }
-                    console.log(payment);
-                    $.ajax({
-                        url: '/confirmation',
-                        method: 'post',
-                        data: {
-                            addressId: addressId,
-                            payment: payment,
-                            GrandTotal: document.getElementById("discount1").innerText,
-                            // discount: document.getElementById("code").innerText
-
-                        },
-                        success: (response) => {
-                            // console.log(response.status)
-                            if (response.method == 'cod') {
-                                console.log("heloooooooooooooo");
-                                Swal.fire({
-                                    title: "Order success",
-                                    text: "order placed successfully",
-                                    icon: "success",
-                                    showCancelButton: true,
-                                    confirmButtonText: "view orders",
-                                    cancelButtonText: "continue shopping",
-                                    reverseButtons: true
-                                })
-                                    .then(function (result) {
-                                        if (result.value) {
-                                            location.href = '/Account'
-                                        } else if (result.dismiss === "cancel") {
-                                            location.href = '/Shop'
-                                        }
-                                    });
-                                
-
-                            } else if (response.method == 'online') {
-                                var options = {
-                                    "key": "rzp_test_80jNgNYgTgs47P", // Enter the Key ID generated from the Dashboard
-                                    "amount": response.order.finalAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                                    "currency": "INR",
-                                    "name": "Evara", //your business name
-                                    "description": "Test Transaction",
-                                    "image": "https://example.com/your_logo",
-                                    "order_id": response.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                                    "handler": function (status) {
-
-                                        verifyPayment(response, status)
-                                    },
-                                    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
-                                        "name": "Gaurav Kumar", //your customer's name
-                                        "email": "gaurav.kumar@example.com",
-                                        "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
-                                    },
-                                    "notes": {
-                                        "address": "Razorpay Corporate Office"
-                                    },
-                                    "theme": {
-                                        "color": "#3399cc"
-                                    }
-                                };
-                                var rzp1 = new Razorpay(options);
-                                rzp1.open();
-
-
-                            } 
-                            else {
-                                Swal.fire({
-                                    title: 'Error Occured',
-                                    text: "Can't process order error occured",
-                                    icon: 'fail',
-                                    timer: 5000
-                                })
-
-                            }
-                        }
-                    })
-                }
-
-
-
-
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                console.log('Text copied to clipboard:', text);
+            } catch (error) {
+                console.error("Failed to copy:", error);
             }
+        }
 
 
-            function verifyPayment(order, payment) {
+        </script>
+
+<script>
+    function makePurchase(GrandTotal) {
+
+        var x = document.getElementById('discountAmount').innerText 
+        var total =  GrandTotal - x
+        
+        let addressId = $("#addressselect:checked").val();
+        if (!addressId) {
+            Swal.fire({
+                title: "select address",
+                text: "",
+                icon: "error",
+                timer: 2000
+            })
+        } else {
+
+            console.log(addressId);
+            // let payment = $(".radio:checked").val();
+            let codbutton = document.getElementById("f-option5")
+            let onlinebutton = document.getElementById("f-option6")
+            let walletbutton = document.getElementById("wallet")
+            let payment
+            if (codbutton.checked) {
+                payment = codbutton.value
+            
+            } else if (onlinebutton.checked) {
+                payment = onlinebutton.value
+            } else if (walletbutton.checked) {
+                payment = walletbutton.value
+            }
+            console.log(payment);
             $.ajax({
-                url: '/verifyPayment',
+                url: '/confirmation',
                 method: 'post',
                 data: {
-                    order,
-                    payment
+                    addressId: addressId,
+                    payment: payment,
+                    GrandTotal:total ,
+                    // discount: document.getElementById("code").innerText
+
                 },
                 success: (response) => {
-                    if(response.method == 'online'){
-                        alert("Razorpayyy")
+                    // console.log(response.status)
+                    if (response.method === 'cod') {
+    // If the payment method is 'cod', redirect to a new page
+    window.location.href = '/orderSucceed';
+}
+ else if (response.method == 'online') {
                         var options = {
-            "key": "rzp_test_8ibpvP8EYnRKl4", // Enter the Key ID generated from the Dashboard
-            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-            "currency": "INR",
-            "name": "Evara",
-            "description": "Test Transaction",
-            "image": "http://localhost:3000/images/logo.png",
-            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "handler": function (response) {
-                verifyPayment(response, order);
-            },
-            "prefill": {
-                "name": "Evara",
-                "email": "cycleshop@gmail.com",
-                "contact": "8089568695"
-            },
-            "notes": {
-                "address": "Razorpay Corporate Office"
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
+                            "key": "rzp_test_7dQjySZBDhgXXu", // Enter the Key ID generated from the Dashboard
+                            "amount": response.total, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "currency": "INR",
+                            "name": "Evara", //your business name
+                            "description": "Test Transaction",
+                            "image": "https://example.com/your_logo",
+                            "order_id": response.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            "handler": function (status) {
 
-                    }
-                    if (response.status) {
-                        Swal.fire({
-                            title: "Order success",
-                            text: "order placed successfully",
-                            icon: "success",
-                            showCancelButton: true,
-                            confirmButtonText: "view orders",
-                            cancelButtonText: "continue shopping",
-                            reverseButtons: true
-                        })
-                        .then(function (result) {
-                            if (result.value) {
-                        location.href = '/Account'
-                            } else if (result.dismiss === "cancel") {
-                                location.href = '/productList'
+                                verifyPayment(response, status)
+                            },
+                            "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                                "name": "Gaurav Kumar", //your customer's name
+                                "email": "gaurav.kumar@example.com",
+                                "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                            },
+                            "notes": {
+                                "address": "Razorpay Corporate Office"
+                            },
+                            "theme": {
+                                "color": "#3399cc"
                             }
-                        });
-                    } else {
-                        alert("Payment failed!" + response.errMsg)
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+
+
+                    } 
+                    else {
+                        Swal.fire({
+                            title: 'Error Occured',
+                            text: "Can't process order error occured",
+                            icon: 'fail',
+                            timer: 5000
+                        })
+
                     }
                 }
             })
         }
-        </script>
+
+
+
+
+    }
+
+
+    function verifyPayment(order, payment) {
+    $.ajax({
+        url: '/verifyPayment',
+        method: 'post',
+        data: {
+            order,
+            payment
+        },
+        success: (response) => {
+            if(response.method == 'online'){
+                
+                var options = {
+    "key": "rzp_test_8ibpvP8EYnRKl4", // Enter the Key ID generated from the Dashboard
+    "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Evara",
+    "description": "Test Transaction",
+    "image": "http://localhost:3000/images/logo.png",
+    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response) {
+        verifyPayment(response, order);
+    },
+    "prefill": {
+        "name": "Evara",
+        "email": "cycleshop@gmail.com",
+        "contact": "8089568695"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.open();
+
+            }
+            if (response.status) {
+                // If the order is successful, redirect to the orderSucceed page
+                window.location.href = '/orderSucceed';
+            } else {
+                // If the payment fails, redirect to the orderFailure page with an error message
+                window.location.href = '/orderFailure';
+                }
+
+            // if (response.status) {
+            //     Swal.fire({
+            //         title: "Order success",
+            //         text: "order placed successfully",
+            //         icon: "success",
+            //         showCancelButton: true,
+            //         confirmButtonText: "view orders",
+            //         cancelButtonText: "continue shopping",
+            //         reverseButtons: true
+            //     })
+            //     .then(function (result) {
+            //         if (result.value) {
+            //     location.href = '/Account'
+            //         } else if (result.dismiss === "cancel") {
+            //             location.href = '/productList'
+            //         }
+            //     });
+            // } else {
+            //     alert("Payment failed!" + response.errMsg)
+            // }
+        }
+    })
+}
+</script>
+
+
+<script>
+    function coupon(total) {
+
+        const discount = document.getElementById("coupon").value
+        const sub = document.getElementById("discount2")
+
+
+        $.ajax({
+            url: '/coupon',
+            method: 'post',
+            data: {
+                discount,
+
+            },
+            success: (response) => {
+                console.log(response);
+                document.getElementById("discountAmount").innerText = response.coupon[0].discountAmount
+                // total.innerText = Number(sub.innerText) - response.coupon.discountAmount
+                
+                document.getElementById('amounts').innerText = total- response.coupon[0].discountAmount
+                
+
+
+            }
+        })
+    }
+</script>

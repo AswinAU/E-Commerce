@@ -16,13 +16,13 @@ const errorHandler = (err, req, res, next) => {
 	// Mongoose validation error
 	if (err.name === 'ValidationError') {
 		statusCode = 400
-        message = Object.values(err.errors).map(value => {
-            if(value.kind === 'Number') return `${value.path} should be a number`
-            return value.message
-        }).join('\n');
+		message = Object.values(err.errors).map(value => {
+			if (value.kind === 'Number') return `${value.path} should be a number`
+			return value.message
+		}).join('\n');
 	}
 
-    console.error(err)
+	console.error(err)
 
 	const isFetch = req.headers['x-requested-with'] === 'XMLHttpRequest'
 	if (isFetch)

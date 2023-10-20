@@ -288,16 +288,16 @@
                                             <td colspan="4">
                                                 <article class="float-end">
                                                     <dl class="dlist">
-                                                        <!-- <dt>Subtotal:</dt>
-                                                        <dd><%=(data.items[0].price*data.items[0].quantity)%></dd> -->
+                                                        <dt>Subtotal:</dt>
+                                                        <dd><%=(data.items[0].price*data.items[0].quantity)%></dd>
                                                     </dl>
-                                                    <!-- <dl class="dlist">
+                                                    <dl class="dlist">
                                                         <dt>discount:</dt>
-                                                        <dd><%=data.discount%></dd>
-                                                    </dl> -->
+                                                        <dd><%=(data.items[0].price*data.items[0].quantity) - data.finalAmount%></dd>
+                                                    </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
-                                                        <dd> <b class="h5"><%=data.items[i].price*data.items[i].quantity%></b> </dd>
+                                                        <dd> <b class="h5"><%=data.finalAmount%></b> </dd>
                                                     </dl>
                                                     <%}%>
                                                     <dl class="dlist">
@@ -354,9 +354,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
     function changeStatus(orderId){
-        alert("HIiiiiiiii")
+        //alert("HIiiiiiiii")
         let status = document.getElementById('orderStatus').value
-        alert(status);
+        //alert(status);
         $.ajax({
             url:'/admin/change-order-status',
             method:'post',
@@ -365,7 +365,7 @@
                 status,
             },
             success:(response)=>{
-                alert(response);
+                //alert(response);
             }
         })
     }

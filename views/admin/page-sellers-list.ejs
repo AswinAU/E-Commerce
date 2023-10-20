@@ -222,7 +222,7 @@
                                     <th>user</th>
                                     <th width="20%">Email</th>
                                     <th>Status</th>
-                                    <th>Mobile</th>
+                                    <!-- <th>Mobile</th> -->
                                     <th class="text-end"> Action </th>
                                 </tr>
                             </thead>
@@ -243,20 +243,21 @@
                                     </td>
                                     <td><%=users[i].email%></td>
                                     <td> 
-                                        <%if(users[i].is_verified==0){%>
+                                        <%if(users[i].is_verified==1){%>
                                             <span class="badge rounded-pill alert-success">Active</span>
                                             <%}else{%>
                                                 <span class="badge rounded-pill alert-danger">Inactive</span>
                                             <%}%>
                                         </td>
-                                    <td><%=users[i].mobile%></td>
+                                    <!-- <td><%=users[i].mobile%></td> -->
                                     <td class="text-end">
-                                        <%if(users[i].is_verified==0){%>
-                                        <a href="/admin/block-user?id=<%=users[i]._id%>"  class="btn btn-sm btn-brand rounded font-sm mt-15">block</a>
-                                        <%}else{%>
-                                         <a href="/admin/unblock-user?id=<%=users[i]._id%>" class="btn btn-sm btn-brand rounded font-sm mt-15" >unblock</a>
-                                        <%}%>
+                                        <% if(users[i].is_verified == 1) { %>
+                                            <button class="btn btn-sm btn-brand rounded font-sm mt-15 block-user" data-user-id="<%= users[i]._id %>">Block</button>
+                                        <% } else { %>
+                                            <button class="btn btn-sm btn-brand rounded font-sm mt-15 unblock-user" data-user-id="<%= users[i]._id %>">Unblock</button>
+                                        <% } %>
                                     </td>
+                                    
                                 </tr>
                                 <%}%>
                                
@@ -293,6 +294,70 @@
             </div>
         </footer>
     </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Function to handle block user operation
+            function blockUser(userId, button) {
+                alert(userId),
+                $.ajax({
+                    method: 'POST',
+                    url: '/admin/block-user',
+                    data: { userId: userId },
+                    success: function(response) {
+                        console.log('User blocked successfully');
+                        // Update button text and class after successful block
+                        button.text('Unblock').removeClass('block-user').addClass('unblock-user');
+                        // Handle success, update UI or perform other actions
+                    },
+                    error: function(error) {
+                        console.error('Error blocking user:', error);
+                        // Handle error, show a message to the user or perform other actions
+                    }
+                });
+            }
+
+            // Function to handle unblock user operation
+            function unblockUser(userId, button) {
+                $.ajax({
+                    method: 'POST',
+                    url: '/admin/unblock-user',
+                    data: { userId: userId },
+                    success: function(response) {
+                        console.log('User unblocked successfully');
+                        // Update button text and class after successful unblock
+                        button.text('Block').removeClass('unblock-user').addClass('block-user');
+                        // Handle success, update UI or perform other actions
+                    },
+                    error: function(error) {
+                        console.error('Error unblocking user:', error);
+                        // Handle error, show a message to the user or perform other actions
+                    }
+                });
+            }
+
+            // Event listener for block/unblock user button click
+            $(document).on('click', '.block-user, .unblock-user', function() {
+                var userId = $(this).data('user-id');
+                var button = $(this);
+
+                if (button.hasClass('block-user')) {
+                    blockUser(userId, button);
+                } else if (button.hasClass('unblock-user')) {
+                    unblockUser(userId, button);
+                }
+            });
+        });
+    </script>
+
+
+
+
+
+
+
     <script src="/public/admin-assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/public/admin-assets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/public/admin-assets/js/vendors/select2.min.js"></script>

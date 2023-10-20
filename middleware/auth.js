@@ -1,4 +1,4 @@
-
+const userModel = require("../model/userModel")
 
 const isLogin = async (req, res, next) => {
     try {
@@ -30,7 +30,30 @@ const isLogout = async (req, res, next) => {
     }
 };
 
+
+// Middleware to check if the user is blocked
+const checkBlocked = async (req, res, next) => {
+    const blocked = await userModel.findOne({ _id: req.session.user });
+
+    // if (!blocked) {
+    //     // User session not found, handle accordingly (e.g., redirect to login page)
+    //     return res.redirect('/login');
+    // }
+
+    console.log(blocked, "bk");
+    if (blocked.is_verified == 0) {
+        console.log("entered");
+        res.status(403).send('Access denied. Your account has been blocked.');
+    } else {
+        console.log("next");
+        next();
+    }
+};
+
+
+
 module.exports = {
     isLogin,
     isLogout,
+    checkBlocked,
 };

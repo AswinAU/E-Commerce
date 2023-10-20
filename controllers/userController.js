@@ -3,13 +3,15 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const config = require("../config/config");
 const otpGenerator = require("otp-generator");
+const randomString = require("randomstring");
 const session = require("express-session");
 const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
+const catMOdel = require("../model/category-model");
+const coupounModel = require("../model/coupon");
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
 //const adminCategories=require("../view/admin/page-categories");
-
 
 // load landing-page
 const loadHome = async (req, res, next) => {
@@ -30,39 +32,92 @@ const loadRegister = async (req, res, next) => {
 };
 
 //user registration
-const insertUser = async (req, res, next) => {
-  console.log(req.body);
 
+const objj = {};
+
+const otppage = async (req, res) => {
   try {
-    if (req.body.password === req.body.repeatPassword) {
-      const spassword = await securePassword(req.body.password);
-      const newUser = new user({
-        name: req.body.name,
-        email: req.body.email,
-        otp: req.body.otp,
-        password: spassword,
-        repeatPassword: spassword,
-        is_admin: 0,
-      });
-      const userData = await newUser.save();
-      if (userData) {
-        req.session.otp = await sendVerifyMail(
-          req.body.name,
-          req.body.email,
-          userData._id
-        );
+    res.render("otp", { userId: req.query.id });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-        res.render("otp", {
-          message: "check your mail for otp and veriy",
-        });
-      } else {
-        res.render("registration", { message: "your registration is failed " });
-      }
+const insertUser = async (req, res, next) => {
+  try {
+    const { name, email, password, repeatPassword, otp } = req.body;
+
+    // Validate name (at least 3 characters)
+    const nameRegex = /^[a-zA-Z\s]+$/;
+
+    if (!name || name.trim().length < 1 || !name.match(nameRegex)) {
+      return res.render("registration", {
+        message: "Name is required and must contain only letters and spaces",
+      });
+    }
+
+    // Validate email using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.match(emailRegex)) {
+      return res.render("registration", { message: "Invalid email address" });
+    }
+
+    // Validate password (either all numbers or all letters, at least 8 characters)
+    const passwordRegex = /^(?:\d+|[a-zA-Z]+){8,}$/;
+    if (!password.match(passwordRegex)) {
+      return res.render("registration", {
+        message:
+          "Password must be at least 8 characters long and consist of either all numbers or all letters",
+      });
+    }
+
+    // Check if passwords match
+    if (password !== repeatPassword) {
+      return res.render("registration", { message: "Passwords didn't match" });
+    }
+
+    // Hash the password
+    const spassword = await securePassword(password);
+
+    // Create a new user
+    const newUser = new user({
+      name: name,
+      email: email,
+      otp: otp,
+      password: spassword,
+      repeatPassword: spassword,
+      is_admin: 0,
+    });
+
+    // Save the user to the database
+    const userData = await newUser.save();
+
+    if (userData) {
+      const otp = randomString.generate({ length: 4, charset: "numeric" });
+      objj.OTP = otp;
+      console.log(objj.OTP);
+      await sendVerifyMail(req.body.name, req.body.email, otp);
+      res.redirect(`/otp?id=${userData._id} `);
     } else {
-      res.render("registration", { message: "passwords didn't match" });
+      res.render("registration", { message: "your registerarion Failed" });
     }
   } catch (err) {
+    // Handle errors
     next(err);
+  }
+};
+
+const recentOpt = async (req, res) => {
+  try {
+    const userId = req.query.userId.trim();
+    const otp = randomString.generate({ length: 4, charset: "numeric" });
+    objj.OTP = otp;
+    console.log("recent", objj.OTP);
+    await sendVerifyMail(req.body.name, req.body.email, otp);
+    const userData = await user.findOne({ _id: userId });
+    res.redirect(`otp?id=${userData._id}`);
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
@@ -77,79 +132,69 @@ const securePassword = async (password) => {
 };
 
 // mail verification
-const sendVerifyMail = async (name, email, user_id) => {
+const sendVerifyMail = async (name, email, otp) => {
   try {
+    console.log("sendemail");
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
-      requireTls: true,
+      requireTLS: true,
       auth: {
         user: config.emailUser,
         pass: config.emailPassword,
       },
     });
-
-    let otp = generateOtp();
-    otp = otp.toLowerCase();
-    //req.session.otp=otp;
-    const mailOptions = {
+    const mailOption = {
       from: "aswinbrototype@gmail.com",
       to: email,
-      subject: "otp for verification",
-      html: `<p> Hi ${name},your otp is ${otp}"verify</a> your mail</p>`,
+      subject: "For verification mail",
+      html:
+        "<p>Hyy " +
+        name +
+        " " +
+        "this is your verify opt " +
+        "  " +
+        otp +
+        ' "</p>',
     };
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOption, function (error, info) {
       if (error) {
         console.log(error.message);
       } else {
-        console.log("email has been sent:", info.response);
-        console.log(otp);
+        console.log("Email has been send :-", info.response);
       }
     });
-
-    return otp;
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
-//generate otp
-const generateOtp = () => {
-  const otp = otpGenerator.generate(6, {
-    upperCaseAlphabets: false,
-    specialChars: false,
-  });
-  return otp;
-};
-
-//otp validation
-const validateOtp = async (req, res, next) => {
+//otp verification
+const validateOtp = async (req, res) => {
   try {
-    otp = req.body.otp.join("");
-    otp = otp.toLowerCase();
-    if (req.session.otp == otp) {
-      await user
-        .findOneAndUpdate(
-          { _id: req.params.id },
-          { is_verified: 0 },
-          { new: true }
-        )
-        .then((updated) => {
-          req.session.loggedIn = true;
-          req.session.user = user;
-          res.redirect("userHome");
-        })
-        .catch((err) => {
-          console.log(err);
-          res.redirect("/user");
-        });
-    } else {
-      console.log("Not success");
-      res.render("otp", { message: "wrong otp retry" });
+    const formdata = req.body.otp1;
+    console.log("Received form data:", formdata);
+    const otp1 = req.body.otp1;
+    const otp2 = req.body.otp2;
+    const otp3 = req.body.otp3;
+    const otp4 = req.body.otp4;
+    const Newopt = otp1 + otp2 + otp3 + otp4;
+    console.log("newOtp :-", Newopt);
+
+    if (objj.OTP === Newopt) {
+      delete objj.OTP;
+      const id = req.body.userId.trim();
+
+      const udpateinfo = await user.updateOne(
+        { _id: id },
+        { $set: { is_verified: 0 } }
+      );
+
+      res.redirect("userHome");
     }
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
@@ -167,32 +212,39 @@ const loginLoad = async (req, res, next) => {
 };
 
 // login verification
+
 const verifyLogin = async (req, res, next) => {
   try {
-    //console.log(req.body);
     const email = req.body.email;
     const password = req.body.password;
-    console.log(email);
-    const userData = await user.findOne({ email: email, is_verified: 0 });
-    //console.log(userData);
+
+    // Validate email using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.match(emailRegex)) {
+      return res.render("login", { message: "Invalid email format" });
+    }
+
+    const passwordRegex = /^(?:\d+|[a-zA-Z]+){8,}$/;
+    if (!password.match(passwordRegex)) {
+      return res.render("login", { message: "Invalid password format" });
+    }
+
+    const userData = await user.findOne({ email: email, is_verified: 1 });
+    
+
     if (userData) {
-      console.log("enter");
-      //console.log(req.session.user,"oo");
       const passwordMatch = await bcrypt.compare(password, userData.password);
-      //console.log(passwordMatch,"p");
-      if (passwordMatch == 0) {
-        console.log("not match");
-        res.render("login", { message: "email and password is incorrect" });
-      } else {
-        req.session.user = userData;
-        console.log("Entered");
-        console.log(req.session.isLoggedIn + "Before");
+
+      if (passwordMatch) {
+        req.session.user = userData._id;
+        
         req.session.isLoggedIn = true;
         res.redirect("/userHome");
-        console.log(userData);
+      } else {
+        res.render("login", { message: "Email or password is incorrect" });
       }
     } else {
-      res.render("login", { message: "email and password is incorrect" });
+      res.render("login", { message: `Email or password is incorrect` });
     }
   } catch (err) {
     next(err);
@@ -229,9 +281,21 @@ const shopLoad = async (req, res, next) => {
         .find()
         .lean()
         .then((data) => {
+          const itemsperpage = 6;
+          const currentpage = parseInt(req.query.page) || 1;
+          const startindex = (currentpage - 1) * itemsperpage;
+          const endindex = startindex + itemsperpage;
+          const totalpages = Math.ceil(data.length / 6);
+          const currentproduct = data.slice(startindex, endindex);
           console.log(data);
           console.log(data.length);
-          res.render("Shop", { data, log: req.session.isLoggedIn });
+          res.render("Shop", {
+            data,
+            log: req.session.isLoggedIn,
+            totalpages,
+            currentpage,
+            data: currentproduct,
+          });
         });
     }
   } catch (err) {
@@ -240,55 +304,22 @@ const shopLoad = async (req, res, next) => {
 };
 
 //whishlist
-const whishList = async (req, res, next) => {
-  try {
-    res.render("whishList", { log: req.session.isLoggedIn });
-  } catch (err) {
-    next(err);
-  }
-};
-
-//cart
-// const cart = async (req, res, next) => {
+// const whishList = async (req, res, next) => {
 //   try {
-
-//     await productModel
-//         .find()
-//         .lean()
-//         .then((data) => {
-//           console.log(data);
-//           console.log(data.length);
-//           res.render("cart", { data, log: req.session.isLoggedIn });
-//         });
-//     // res.render("cart", { log: req.session.isLoggedIn });
+//     res.render("whishList", { log: req.session.isLoggedIn });
 //   } catch (err) {
 //     next(err);
 //   }
+// };
+
 // };
 
 //myProfile
-// const profile = async (req, res, next) => {
-//   try {
-//     const data = await user.findById(req.session.user._id).lean();
-//     console.log("Dataaaaaaaaaa", data.address.length);
-//     res.render("myProfile", { data, log: req.session.isLoggedIn });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 const profile = async (req, res, next) => {
-  // try {
-  //   const data = await user.findById(req.session.user._id).lean();
-  //   console.log("Dataaaaaaaaaa");
-  //   res.render("myProfile", { data, userdata, log: req.session.isLoggedIn });
-  // } catch (err) {
-  //   next(err);
-  // }
-
   try {
-    var userdata = await req.session.user._id;
+    var userdata = await req.session.user;
     user.findById(userdata).then((data) => {
-      res.render("myProfile", { data, userdata,log: req.session.isLoggedIn });
+      res.render("myProfile", { data, userdata, log: req.session.isLoggedIn });
       console.log(data, "mmmmmmmmmmmmm");
     });
   } catch (err) {
@@ -300,7 +331,7 @@ const profile = async (req, res, next) => {
 const addressForm = async (req, res, next) => {
   try {
     await user.find({}).then((data) => {
-      res.render("add-address", { data });
+      res.render("add-address", { data, log: req.session.isLoggedIn });
     });
   } catch (err) {
     next(err);
@@ -310,7 +341,7 @@ const addressForm = async (req, res, next) => {
 //add-address
 const confirmAddress = async (req, res, next) => {
   try {
-    var id = req.session.user._id;
+    var id = req.session.user;
     console.log(id);
     console.log("hhhhhhhhhhhhhhhhhhhhh");
 
@@ -343,15 +374,15 @@ const confirmAddress = async (req, res, next) => {
 const editAddress = async (req, res, next) => {
   try {
     const ad = req.query.id;
-    const login = req.session.user._id;
-    let oid = new mongodb.ObjectId(login);
+    const login = req.session.user;
+    const oid = new mongodb.ObjectId(login);
 
     console.log(ad, "lllllllllllllllll");
     const profile = await user.findById(login);
     console.log(profile, "prrrrrr");
     const userAddress = profile.address.id(ad);
 
-    res.render("editaddress", { userAddress });
+    res.render("editaddress", { userAddress, log: req.session.isLoggedIn });
     console.log(userAddress, "adddddddd");
   } catch (err) {
     next(err);
@@ -364,7 +395,7 @@ const confirmEdit = async (req, res, next) => {
     const quer = req.query.id;
     console.log(quer, "helllllllllllll");
 
-    var id = req.session.user._id;
+    var id = req.session.user;
     console.log(id);
     const User = await user.findById(id);
     const address = User.address.id(quer);
@@ -390,7 +421,7 @@ const confirmEdit = async (req, res, next) => {
 // address deletion
 const removeAddres = async (req, res, next) => {
   console.log("hellllllllllllllll");
-  id = req.session.user._id;
+  id = req.session.user;
   console.log(id);
 
   const profile = await user.findById(id);
@@ -415,17 +446,17 @@ const products = async (req, res, next) => {
 
 const checkout = async (req, res, next) => {
   try {
-    // let coupons = await coupounModel.find({
-    //   minimumAmount: { $lte: req.body.total },
-    // });
-    // console.log(coupons);
-    console.log(req.session.user._id, "oooo");
-    user.find({ _id: req.session.user._id }).then((data) => {
+    const coupons = await coupounModel.find({
+      minimumAmount: { $lte: req.body.total },
+    });
+    console.log(coupons);
+    console.log(req.session.user, "oooo");
+    user.find({ _id: req.session.user }).then((data) => {
       console.log(data, "dtaaa");
       res.render("checkOut1", {
         data: data,
         total: req.body.total,
-        // coupons,
+        coupons,
         log: req.session.isLoggedIn,
       });
       console.log(data, "checkoutooooooooooooo");
@@ -439,11 +470,11 @@ const checkout = async (req, res, next) => {
 
 const confirmation = async (req, res, next) => {
   try {
-    console.log(req.body.payment);
+    console.log(req.body);
 
     const status = req.body.payment;
 
-    const userData = await user.findById(req.session.user._id);
+    const userData = await user.findById(req.session.user);
     console.log(userData, "00000");
     const items = [];
 
@@ -453,9 +484,12 @@ const confirmation = async (req, res, next) => {
       const product = await productModel.findById(userData.cart[i].productId);
 
       if (product) {
-        console.log(product,"producttttt");
+        console.log(product, "producttttt");
         if (product.quantity < 1) {
-          console.log(product.quantity,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+          console.log(
+            product.quantity,
+            "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+          );
           canPlaceOrder = false; // Product quantity is below 1, cannot place the order
           console.error(`Product with ID ${product._id} has quantity below 1.`);
 
@@ -492,20 +526,20 @@ const confirmation = async (req, res, next) => {
     }
 
     const order = await orderModel.create({
-      user: req.session.user._id,
+      user: req.session.user,
       items,
       address: userData.address[0],
       paymentMode: status,
-      // discount: req.body.discount,
+      discount: req.body.GrandTotal,
       totalAmount: 0,
-      finalAmount: 0,
+      finalAmount: req.body.GrandTotal,
     });
 
     console.log(order, "Order Created");
 
     if (order.paymentMode === "cod") {
       console.log("COD: " + order.paymentMode);
-      id = req.session.user._id;
+      id = req.session.user;
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
         .then((data) => {
@@ -516,22 +550,21 @@ const confirmation = async (req, res, next) => {
         });
 
       res.json({ payment: true, method: "cod", order: order });
-    
     } else if (order.paymentMode === "online") {
       console.log("onlineeeeeeeeeeeeeeeeee");
       const generatedOrder = await generateOrderRazorpay(
         order._id,
-        order.totalAmount
+        req.body.GrandTotal
       );
       res.json({
         payment: false,
         method: "online",
         razorpayOrder: generatedOrder,
         order: order,
+        total: req.body.GrandTotal,
       });
-    } 
-    else if (order.paymentMode === "wallet") {
-      id = req.session.user._id;
+    } else if (order.paymentMode === "wallet") {
+      id = req.session.user;
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
         .then((data) => {
@@ -569,13 +602,13 @@ const userModel = require("../model/userModel");
 const { log } = require("console");
 // const { default: items } = require("razorpay/dist/types/items");
 const instance = new Razorpay({
-  key_id: "rzp_test_80jNgNYgTgs47P",
-  key_secret: "Ag95tYV92s1TcaDaz0Ix79A8",
+  key_id: "rzp_test_7dQjySZBDhgXXu",
+  key_secret: "j6bRLlKZCjqKXeZ9iC1i2Iz8",
 });
 
 const generateOrderRazorpay = (orderId, total) => {
   return new Promise((resolve, reject) => {
-    console.log(total,'totallll');
+    console.log(total, "totallll");
     const options = {
       amount: total * 100, // amount in the smallest currency unit
       currency: "INR",
@@ -594,13 +627,12 @@ const generateOrderRazorpay = (orderId, total) => {
   });
 };
 
-
 const verifyRazorpayPayment = (req, res, next) => {
   try {
     verifyOrderPayment(req.body)
       .then(async () => {
         console.log("Payment SUCCESSFUL");
-        id = req.session.user._id;
+        id = req.session.user;
         await user
           .findByIdAndUpdate(id, { $set: { cart: [] } })
           .then((data) => {
@@ -626,7 +658,7 @@ const verifyOrderPayment = (details) => {
   console.log("DETAILS : " + JSON.stringify(details));
   return new Promise((resolve, reject) => {
     const crypto = require("crypto");
-    let hmac = crypto.createHmac("sha256", "Ag95tYV92s1TcaDaz0Ix79A8");
+    let hmac = crypto.createHmac("sha256", "j6bRLlKZCjqKXeZ9iC1i2Iz8");
     hmac.update(
       details.payment.razorpay_order_id +
         "|" +
@@ -643,15 +675,11 @@ const verifyOrderPayment = (details) => {
   });
 };
 
-
-
-
-
 const userProfile = async (req, res, next) => {
   try {
-    var userdata = await req.session.user._id;
+    var userdata = await req.session.user;
     user.findById(userdata).then((data) => {
-      res.render("myProfile", { data,log: req.session.isLoggedIn, userdata });
+      res.render("myProfile", { data, log: req.session.isLoggedIn, userdata });
       console.log(data, "mmmmmmmmmmmmm");
     });
   } catch (err) {
@@ -659,13 +687,11 @@ const userProfile = async (req, res, next) => {
   }
 };
 
-
-
 const ShowOrders = async (req, res, next) => {
   try {
     console.log(req.query.id);
     const oid = new mongodb.ObjectId(req.query.id);
-    let orders = await orderModel.aggregate([
+    const orders = await orderModel.aggregate([
       { $match: { user: oid } },
       { $unwind: "$items" },
       {
@@ -712,15 +738,14 @@ const ShowOrders = async (req, res, next) => {
   }
 };
 
-
 const orderDetails = async (req, res, next) => {
   try {
     console.log(req.query.id);
     const oid = new mongodb.ObjectId(req.query.id);
 
-    const user = req.session.user._id;
+    const user = req.session.user;
     console.log(user);
-    let orders = await orderModel.aggregate([
+    const orders = await orderModel.aggregate([
       { $match: { _id: oid } },
       { $unwind: "$items" },
       {
@@ -758,14 +783,13 @@ const orderDetails = async (req, res, next) => {
   }
 };
 
-
 //order status
 const changeStatus = (req, res, next) => {
   try {
     orderModel
       .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
       .then((order) => {
-         addToWallet(req, res, order.totalAmount, "c");
+        addToWallet(req, res, order.totalAmount, "c");
         console.log(order);
         res.json(true);
       })
@@ -780,7 +804,7 @@ const changeStatus = (req, res, next) => {
 };
 
 const addToWallet = async (req, res, amount, transactionType) => {
-  var id = req.session.user._id;
+  var id = req.session.user;
   console.log(id);
 
   await user
@@ -795,9 +819,9 @@ const addToWallet = async (req, res, amount, transactionType) => {
 };
 
 //wallet
-const wallet = (req,res,next)=>{
-  try{
-    const userId = req.session.user._id;
+const wallet = (req, res, next) => {
+  try {
+    const userId = req.session.user;
     console.log(userId);
     user.findById(userId).then((data) => {
       data.wallet.reverse();
@@ -811,28 +835,193 @@ const wallet = (req,res,next)=>{
       console.log("Current products : ", currentproduct);
 
       console.log(totalpages);
-      res.render("wallet", {log: req.session.isLoggedIn, data: currentproduct, totalpages, currentpage });
+      res.render("wallet", {
+        log: req.session.isLoggedIn,
+        data: currentproduct,
+        totalpages,
+        currentpage,
+      });
     });
   } catch (err) {
     next(err);
   }
+};
+
+const checkCoupon = async (req, res, next) => {
+  try {
+    const discountValue = req.body.discount;
+    console.log(req.body, "requestttt");
+
+    const coupon = await coupounModel.find({
+      code: discountValue.toLowerCase(),
+    });
+    console.log(coupon, "coouuppeennnn");
+    res.json({ coupon });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//category
+const subCategory = async (req, res, next) => {
+  const category = await catMOdel.find().lean();
+  console.log(req.query.cat);
+  await productModel
+    .find({ category: req.query.cat })
+    .lean()
+    .then((data) => {
+      data.reverse();
+      const itemsperpage = 5;
+      const currentpage = parseInt(req.query.page) || 1;
+      const startindex = (currentpage - 1) * itemsperpage;
+      const endindex = startindex + itemsperpage;
+      const totalpages = Math.ceil(data.length / 5);
+      const currentproduct = data.slice(startindex, endindex);
+      res.render("single-product", {
+        log: req.session.isLoggedIn,
+        data: data,
+        subCategory: req.params.cat,
+        cat: null,
+        totalPages: false,
+        totalpages,
+        currentpage,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+const priceFilter = async (req, res, next) => {
+  try {
+    const priceRange = req.body.priceRange;
+    const [minPrice, maxPrice] = priceRange.split("-").map(Number);
+
+    const filteredProducts = await productModel
+      .find({
+        $and: [
+          { sale_price: { $gte: minPrice } },
+          { sale_price: { $lte: maxPrice } },
+        ],
+      })
+      .lean();
+    console.log(filteredProducts, "filteredProducts");
+
+    const itemsPerPage = 8;
+    const currentPage = parseInt(req.query.page) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const totalProducts = filteredProducts.length;
+    const totalPages = Math.ceil(totalProducts / itemsPerPage);
+    const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+    res.json({
+      data: currentProducts,
+      totalProducts: totalProducts,
+      totalPages: totalPages,
+      currentPage: currentPage,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const filteredProducts = async (req, res, next) => {
+  try {
+    if (!req.session.isLoggedIn) {
+      res.redirect("/login");
+    } else {
+      // Retrieve the encoded data from the query parameter
+      const encodedData = req.query.data;
+      const currentPage = parseInt(req.query.page) || 1; // Get the current page from the query parameter
+
+      if (encodedData) {
+        // Decode the query parameter and parse it back to an object
+        const filteredData = JSON.parse(decodeURIComponent(encodedData));
+
+        // Implement pagination logic here based on currentPage and itemsPerPage
+        const itemsPerPage = 6; // Number of items to display per page
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const totalProducts = filteredData.length;
+        const totalPages = Math.ceil(totalProducts / itemsPerPage);
+        const currentProducts = filteredData.slice(startIndex, endIndex);
+
+        // Pass the filtered data and pagination information to the view
+        res.render("filtered-products", {
+          log: req.session.isLoggedIn,
+          data: currentProducts,
+          currentpage: currentPage,
+          totalpages: totalPages,
+          
+        });
+      } else {
+        // Handle case where there is no filtered data available
+        res.render("filtered-products", {
+          log: req.session.isLoggedIn,
+          data: null,
+          currentpage: null,
+          totalpages: null,
+        });
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    // Handle errors appropriately
+  }
+};
+
+
+const searchProd = async (req, res, next) => {
+  try {
+    console.log(req.body.search,'testttttttttttttttt');
+    let data = await productModel.find({
+      name: { $regex: `${req.body.search}`, $options: "i" },
+    });
+    console.log(req.body.search,'testttttttttttttttt');
+    console.log(data,'dattaaaaaaaaaaaa');
+    res.render("Shop", { data,log: req.session.isLoggedIn, });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+const orderSucceed = async(req,res, next)=>{
+  try {
+    res.render("ordersucceed", { log: req.session.isLoggedIn });
+  } catch (err) {
+    next(err)
+  }
 }
+
+
+const orderFailure = async(req,res, next)=>{
+  try {
+    res.render("orderFailure", { log: req.session.isLoggedIn });
+  } catch (err) {
+    next(err)
+  }
+}
+
+
+
 
 
 
 module.exports = {
   loadRegister,
   insertUser,
+  recentOpt,
   loginLoad,
   verifyLogin,
   sendVerifyMail,
-  generateOtp,
+  otppage,
   validateOtp,
   loadHome,
   logOut,
   shopLoad,
-  whishList,
-  // cart,
+  //whishList,
   loadLogin,
   products,
   checkout,
@@ -849,4 +1038,11 @@ module.exports = {
   changeStatus,
   wallet,
   verifyRazorpayPayment,
+  checkCoupon,
+  subCategory,
+  priceFilter,
+  filteredProducts,
+  searchProd,
+  orderSucceed,
+  orderFailure
 };
