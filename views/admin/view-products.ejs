@@ -276,13 +276,16 @@
                                     <span class="badge rounded-pill alert-success"><%=item.category%></span>
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                    <a href="/admin/edit/<%=item._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                                        <i class="material-icons md-edit"></i> Edit
-                                    </a>
-                                    <a href="/admin/delete-product/<%=item._id%>" class="btn btn-sm font-sm btn-light rounded">
-                                        <i class="material-icons md-delete_forever"></i> Delete
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <a href="/admin/edit/<%=item._id%>" class="btn btn-sm font-sm rounded btn-brand">
+                                            <i class="material-icons md-edit"></i> Edit
+                                        </a>&nbsp;
+                                        <a href="/admin/delete-product/<%=item._id%>" class="btn btn-sm font-sm btn-light rounded">
+                                            <i class="material-icons md-delete_forever"></i> Delete
+                                        </a>
+                                    </div>
                                 </div>
+                                
                             </div> <!-- row .// -->
                         </article>
                     <% }) %> <!-- itemlist  .// -->

@@ -44,7 +44,7 @@ module.exports = {
         ).then((data) => {
           console.log("Thennnnnnnnnn");
           console.log(data);
-          res.json({ status: false });
+          res.json({ status: true });
         });
       }
     } catch (err) {
@@ -54,10 +54,10 @@ module.exports = {
 
   getCartPage: async (req, res, next) => {
     try {
-      console.log("Entered");
+      //console.log("Entered");
 
       const userId = req.session.user;
-      console.log(userId);
+      //console.log(userId);
       let user = userId;
       const oid = new mongodb.ObjectId(userId);
 
@@ -115,43 +115,47 @@ module.exports = {
   addToCart: async (req, res, next) => {
     try {
       var id = req.session.user;
-      console.log(req.session.user, "cartttttttttttt");
-      console.log(id);
+      //console.log(req.session.user, "cartttttttttttt");
+      //console.log(id);
       var productId = req.query.id;
-      console.log(productId, "product id");
+      //console.log(productId, "product id");
       const userData = await User.findById({ _id: id }).lean();
-      console.log(userData);
+      //console.log(userData);
       if (userData.cart) {
         console.log("oi");
         const cartIndex = userData.cart.findIndex(
           (item) => item.productId === productId
         );
-        console.log("cartIndex", cartIndex);
+       // console.log("cartIndex", cartIndex);
         if (cartIndex !== -1) {
-          console.log("IFffffffffffffffffffff");
-          const productInCart = userData.cart[cartIndex];
-          const newQuantity =
-            parseInt(productInCart.quantity) + parseInt(req.body.quantity);
-          console.log("NEw quantity :", newQuantity);
-          await User.updateOne(
-            { _id: id, "cart.productId": productId },
-            {
-              $set: {
-                "cart.$.quantity": newQuantity,
-                "cart.$.size": req.body.size,
-              },
-            }
-          );
-          res.redirect(`/product-details?id=${productId}`);
+          
+          // const productInCart = userData.cart[cartIndex];
+          // const newQuantity =
+          //   parseInt(productInCart.quantity) + parseInt(req.body.quantity);
+          // const newPrice = parseInt(productInCart.price) + parseInt(req.body.sale_price);
+          
+          // await User.updateOne(
+          //   { _id: id, "cart.productId": productId },
+          //   {
+          //     $set: {
+          //       "cart.$.quantity": newQuantity,
+          //       "cart.$.sale_price": newPrice,
+          //       "cart.$.size": req.body.size,
+          //     },
+          //   }
+          // );
+          // res.redirect(`/product-details?id=${productId}`);
           // res.redirect('/product-display')
         } else {
           console.log("Product not found in cart.");
           var quantity = parseInt(req.body.quantity);
+          var newPrice = parseInt(req.body.sale_price);
           User.findByIdAndUpdate(id, {
             $push: {
               cart: {
                 productId: productId,
                 quantity: quantity,
+                newPrice:newPrice,
                 size: req.body.size,
               },
             },

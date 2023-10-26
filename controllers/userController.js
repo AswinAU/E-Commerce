@@ -8,9 +8,11 @@ const session = require("express-session");
 const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
 const catMOdel = require("../model/category-model");
-const coupounModel = require("../model/coupon");
+const coupounModel = require("../model/coupenModel");
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
+const easyinvoice = require("easyinvoice");
+const { Readable } = require("stream");
 //const adminCategories=require("../view/admin/page-categories");
 
 // load landing-page
@@ -446,17 +448,17 @@ const products = async (req, res, next) => {
 
 const checkout = async (req, res, next) => {
   try {
-    const coupons = await coupounModel.find({
+    const coupon = await coupounModel.find({
       minimumAmount: { $lte: req.body.total },
     });
-    console.log(coupons);
+    console.log(coupon);
     console.log(req.session.user, "oooo");
     user.find({ _id: req.session.user }).then((data) => {
       console.log(data, "dtaaa");
       res.render("checkOut1", {
         data: data,
         total: req.body.total,
-        coupons,
+        coupon,
         log: req.session.isLoggedIn,
       });
       console.log(data, "checkoutooooooooooooo");
@@ -596,10 +598,12 @@ const confirmation = async (req, res, next) => {
   }
 };
 
+
 const Razorpay = require("razorpay");
 const { Transaction } = require("mongodb");
 const userModel = require("../model/userModel");
 const { log } = require("console");
+//const { default: orders } = require("razorpay/dist/types/orders");
 // const { default: items } = require("razorpay/dist/types/items");
 const instance = new Razorpay({
   key_id: "rzp_test_7dQjySZBDhgXXu",
@@ -689,7 +693,7 @@ const userProfile = async (req, res, next) => {
 
 const ShowOrders = async (req, res, next) => {
   try {
-    console.log(req.query.id);
+    
     const oid = new mongodb.ObjectId(req.query.id);
     const orders = await orderModel.aggregate([
       { $match: { user: oid } },
@@ -723,6 +727,7 @@ const ShowOrders = async (req, res, next) => {
     const totalpages = Math.ceil(orders.length / 5);
     const currentproduct = orders.slice(startindex, endindex);
     let userData = req.session.user;
+    console.log(userData,'userdatttaaaaaaaaaaaa');
     console.log("Current products", currentproduct);
     res.render("orderlist", {
       orders: currentproduct,
@@ -847,20 +852,20 @@ const wallet = (req, res, next) => {
   }
 };
 
-const checkCoupon = async (req, res, next) => {
-  try {
-    const discountValue = req.body.discount;
-    console.log(req.body, "requestttt");
+// const checkCoupon = async (req, res, next) => {
+//   try {
+//     const discountValue = req.body.discount;
+//     console.log(req.body, "requestttt");
 
-    const coupon = await coupounModel.find({
-      code: discountValue.toLowerCase(),
-    });
-    console.log(coupon, "coouuppeennnn");
-    res.json({ coupon });
-  } catch (err) {
-    next(err);
-  }
-};
+//     const coupon = await coupounModel.find({
+//       code: discountValue.toLowerCase(),
+//     });
+//     console.log(coupon, "coouuppeennnn");
+//     res.json({ coupon });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 //category
 const subCategory = async (req, res, next) => {
@@ -1004,6 +1009,115 @@ const orderFailure = async(req,res, next)=>{
   }
 }
 
+// invoice
+
+const downloadInvoice = async (req, res, next) => {
+  try {
+    const id = req.query.id;
+    console.log(id, "helllllloooo");
+    const userId = req.session.user._id;
+    const result = await orderModel.findById(id);
+    console.log(result.items[0].product);
+    const product = await productModel.findById(result.items[0].product);
+
+    console.log(product, "pd");
+
+    const User = await user.findOne({ _id: userId });
+    console.log("USER: ", User);
+    console.log("RESULT: ", result);
+    console.log("helele");
+    //   const address = await User.address.find(
+    //     (element) => {
+    //         console.log(element._id,'plkmjujk')
+    //         console.log(result.address[0]._id,'plkmjujk')
+    //         element._id == result.address[0]._id
+    //     }
+    //   );
+
+    const order = {
+      _id: id,
+      totalAmount: result.totalAmount,
+      date: result.createdAt, // Use the formatted date
+      paymentMethod: result.paymentMode,
+      orderStatus: result.orderStatus,
+      discount: result.discount,
+      name: result.address[0].name,
+      number: result.address[0].number,
+      pincode: result.address[0].pinCode,
+      area: result.address[0].area,
+      landmark: result.address[0].landmark,
+      state: result.address[0].state,
+      house: result.address[0].house,
+      items: result.items,
+    };
+    console.log(order, "orrrrder");
+    //set up the product
+    const products = order.items.map((items) => ({
+      quantity: parseInt(items.quantity),
+      description: product.name,
+
+      price: parseInt(product.sale_price),
+      total: parseInt(result.finalAmount),
+      "tax-rate": 0,
+    }));
+    const isoDateString = order.date;
+    const isoDate = new Date(isoDateString);
+
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = isoDate.toLocaleDateString("en-US", options);
+    const data = {
+      customize: {
+        //  "template": fs.readFileSync('template.html', 'base64') // Must be base64 encoded html
+      },
+      images: {
+        // The invoice background
+        background: "https://public.easyinvoice.cloud/img/watermark-draft.jpg",
+      },
+      // Your own data
+      sender: {
+        company: "Evara clothings",
+        address: "Evara clothings Hub maradu",
+        city: "Kochi",
+        country: "India",
+      },
+      client: {
+        company: "Customer Address",
+        zip: order.pincode,
+        city: order.area,
+        address: order.name,
+        // "custom1": "custom value 1",
+        // "custom2": "custom value 2",
+        // "custom3": "custom value 3"
+      },
+      information: {
+        // Invoice number
+        number: "order:" + order._id,
+        // ordered date
+        date: formattedDate,
+      },
+      products: products,
+      "bottom-notice": "Happy shoping and visit here again",
+    };
+
+    const pdfResult = await easyinvoice.createInvoice(data);
+    const pdfBuffer = Buffer.from(pdfResult.pdf, "base64");
+
+    // Set HTTP headers for the PDF response
+    res.setHeader("Content-Disposition", 'attachment; filename="invoice.pdf"');
+    res.setHeader("Content-Type", "application/pdf");
+
+    // Create a readable stream from the PDF buffer and pipe it to the response
+    const pdfStream = new Readable();
+    pdfStream.push(pdfBuffer);
+    pdfStream.push(null);
+
+    pdfStream.pipe(res);
+  } catch (err) {
+    next(err);
+    //   res.status(500).json({ error: error.message });
+  }
+};
+
 
 
 
@@ -1038,11 +1152,14 @@ module.exports = {
   changeStatus,
   wallet,
   verifyRazorpayPayment,
-  checkCoupon,
+  //checkCoupon,
   subCategory,
   priceFilter,
   filteredProducts,
   searchProd,
   orderSucceed,
-  orderFailure
+  orderFailure,
+  downloadInvoice
+
+  
 };

@@ -115,8 +115,8 @@
 
                         <div class="checkout_btn_inner col-8 col-lg-9 col-md-4 ">
                             <form action="/check-out" method="post">
-                                <input type="hidden" name="total" <%if(locals.total){%> value="<%=total%>"<%}%>>
-                                <button type="submit" class="btn btn-success w-100 shadow-0 mb-2"> proceed to checkout</button>      
+                                <input type="hidden" name="total" id="totalInput" <%if(locals.total){%> value="<%=total%>"<%}%>>
+                                <button type="submit" class="btn btn-success w-100 shadow-0 mb-2">proceed to checkout</button>      
                             </form>
                         </div>
 
@@ -135,7 +135,13 @@
 
         function changeQuantity(userId, proId, count, quantity) {
 
+alert(count)
+alert(quantity)
+alert(proId)
+
+
             const qty = document.getElementById(proId)
+            alert(qty.value)
 
             if (qty.value > 1 || count == 1) {
 
@@ -147,29 +153,36 @@
                         timer: 5000
                     })
                 } else {
+                    alert('in this else')
 
 
                     qty.value = Number(qty.value) + count
-
+alert( qty.value)
                     const sub = document.getElementById(`${proId}pro-total`)
+                    alert(sub)
                     const subPrice = document.getElementById(`${proId}price`)
+                    alert(subPrice)
                     sub.textContent = qty.value * subPrice.textContent
+                    alert(sub.textContent)
 
 
 
 
                     const items = document.querySelectorAll(".item-total")
+                    alert(items)
                     const final = document.querySelector("#final-amount")
+                    alert('hdf;kasjdfh;ksdfjha;')
+                    alert(final)
                     let amt = 0
                     items.forEach(item => {
                         amt += Number(item.innerText)
                     })
                     final.innerText = amt
-
+alert(final.innerText)
 
 
                     let quantity = qty.value - count
-
+alert(quantity)
                     $.ajax({
                         url: "/change-quantity",
                         method: 'post',
@@ -180,13 +193,22 @@
                             quantity: quantity,
                         },
                         success: (response) => {
+                         
                             console.log(response.status)
 
                             if (response.status == true) {
-                                location.reload();
+                                alert('haiu')
+                                var totalInput = document.getElementsByName('total')[0];
+                                alert(totalInput.value)
+                                totalInput.value = final.innerText
+                                alert(totalInput.value)
+                                alert('sucesss')
+                                
+                                // location.reload();
                             } else {
+                               
                                 let total = parseInt(quantity) + parseInt(count);
-                                document.getElementById(proId).value = total;
+                              const h=  document.getElementById(proId).value = total;
 
                             }
                         }

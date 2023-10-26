@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const categoryModel = require("../model/category-model");
 const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
-const couponModel = require("../model/coupon");
+const couponModel = require("../model/coupenModel");
 const mongodb = require("mongodb");
 
 //login page
@@ -108,13 +108,23 @@ const logout = async (req, res, next) => {
 // user-list
 const userslist = async (req, res, next) => {
   try {
-    let users = await user.find({ is_admin: 0 });
-    console.log(users);
-    res.render("page-sellers-list", { users });
+      const page = req.query.page || 1;
+      const limit = 5; // Number of users per page
+      const skip = (page - 1) * limit;
+
+      const users = await user.find({ is_admin: 0 }).skip(skip).limit(limit);
+      const totalUsers = await user.countDocuments({ is_admin: 0 });
+
+      res.render("page-sellers-list", {
+          users,
+          currentPage: page,
+          totalPages: Math.ceil(totalUsers / limit)
+      });
   } catch (err) {
-    next(err);
+      next(err);
   }
 };
+
 
 //block-user
 const blockUser = async (req, res, next) => {
@@ -255,39 +265,39 @@ const changeStatus = (req, res, next) => {
 };
 
 //coupen
-const addcoupon = async (req, res, next) => {
-  console.log(req.body);
-  try {
-    couponModel.find({}).then((data) => {
-      data.reverse();
-      const itemsperpage = 3;
-      const currentpage = parseInt(req.query.page) || 1;
-      const startindex = (currentpage - 1) * itemsperpage;
-      const endindex = startindex + itemsperpage;
-      const totalpages = Math.ceil(data.length / 3);
-      const currentproduct = data.slice(startindex, endindex);
-      res.render("addcoupon", {
-        data: currentproduct,
-        totalpages,
-        currentpage,
-      });
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+// const addcoupon = async (req, res, next) => {
+//   console.log(req.body);
+//   try {
+//     couponModel.find({}).then((data) => {
+//       data.reverse();
+//       const itemsperpage = 3;
+//       const currentpage = parseInt(req.query.page) || 1;
+//       const startindex = (currentpage - 1) * itemsperpage;
+//       const endindex = startindex + itemsperpage;
+//       const totalpages = Math.ceil(data.length / 3);
+//       const currentproduct = data.slice(startindex, endindex);
+//       res.render("addcoupon", {
+//         data: currentproduct,
+//         totalpages,
+//         currentpage,
+//       });
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
-const addcouponpost = async (req, res, next) => {
-  console.log("kkkkkkkkkkkkkkkkkkkkkkkkkk");
-  try {
-    console.log(req.body);
-    let coupon = req.body;
-    await couponModel.create(coupon);
-    res.redirect("back");
-  } catch (err) {
-    next(err);
-  }
-};
+// const addcouponpost = async (req, res, next) => {
+//   console.log("kkkkkkkkkkkkkkkkkkkkkkkkkk");
+//   try {
+//     console.log(req.body);
+//     let coupon = req.body;
+//     await couponModel.create(coupon);
+//     res.redirect("back");
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 module.exports = {
   loadLogin,
@@ -300,6 +310,6 @@ module.exports = {
   ShowOrders,
   orderDetail,
   changeStatus,
-  addcoupon,
-  addcouponpost,
+  //addcoupon,
+  //addcouponpost,
 };

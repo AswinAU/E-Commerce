@@ -266,18 +266,21 @@
                     </div>
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
-            <div class="pagination-area mt-15 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
+            <!-- pagination -->
+            <!-- ... (previous HTML code) ... -->
+
+<div class="pagination">
+    <% if (currentPage > 1) { %>
+        <a href="/admin/userslist?page=<%= currentPage - 1 %>" class="btn btn-sm btn-primary">Previous</a>
+    <% } %>
+    
+    <% if (currentPage < totalPages) { %>
+        <a href="/admin/userslist?page=<%= currentPage + 1 %>" class="btn btn-sm btn-primary">Next</a>
+    <% } %>
+</div>
+
+<!-- ... (remaining HTML code) ... -->
+
         </section> <!-- content-main end// -->
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">

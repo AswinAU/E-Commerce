@@ -1,6 +1,7 @@
 const express=require("express");
 const user_route=express();
 const userController =require("../controllers/userController");
+const couponController = require("../controllers/couponController");
 const session=require("express-session");
 const config=require('../config/config')
 const path = require('path')
@@ -72,6 +73,7 @@ user_route.post("/addwhishlist", auth.isLogin, cartController.addTowhishlist)
 user_route.post("/removeFromCart", cartController.deleteCart)
 user_route.post("/removeFromwhishlist", cartController.deletewhishlist)
 user_route.post("/change-quantity", cartController.changeQuantity)
+
 //myProfile
 user_route.get("/address", auth.isLogin, auth.checkBlocked,userController.profile)
 user_route.get("/addAdress",auth.isLogin, userController.addressForm)
@@ -83,20 +85,26 @@ user_route.post("/removeAdd", userController.removeAddres)
 
 //check-out
 user_route.post("/check-out",auth.isLogin, userController.checkout)
+
 //order
 user_route.post("/confirmation", auth.isLogin, userController.confirmation)
+//user_route.post("/oderPlaced", auth.isLogin, userController.oderPlaced)
 user_route.get("/Account", auth.isLogin, userController.userProfile)
-user_route.get("/orderlist", userController.ShowOrders)
-user_route.get("/orderDetail", userController.orderDetails)
+user_route.get("/orderlist", auth.isLogin,userController.ShowOrders)
+user_route.get("/orderDetail", auth.isLogin,userController.orderDetails)
 user_route.post("/change-order-status", userController.changeStatus)
+
+user_route.post("/invoice", userController.downloadInvoice)
 
 //wallet
 user_route.get("/wallet",auth.isLogin,userController.wallet)
 user_route.post("/verifyPayment", userController.verifyRazorpayPayment)
 
-user_route.post("/coupon", userController.checkCoupon)
+//coupon
+//user_route.post("/coupon", userController.checkCoupon)
 user_route.get("/orderSucceed",userController.orderSucceed)
 user_route.get("/orderFailure",userController.orderFailure)
+user_route.post("/validateCoupon",couponController.validateCoupon)
 
 
 user_route.use(errorHandler)

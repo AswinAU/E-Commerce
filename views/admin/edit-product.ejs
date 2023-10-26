@@ -290,15 +290,17 @@
                         <div class="card-header">
                             <h4>Media</h4>
                         </div>
+                        <% for (let i = 0; i < data[0].images.length; i++) { %>
                         <div class="card-body">
                             <div class="input-upload">
-                                <% for (let i = 0; i < data[0].images.length; i++) { %>
+                               
                                     <img src="/upload/product/<%= data[0].images[i] %>" alt="Product Image <%= i + 1 %>">
-                                <% } %>
+                               
                                 <!-- <img src="/upload/product/<%=data[0].images%>" alt=""> -->
                                 <input name="image" class="form-control"value="<%=data[0].images%>" type="file" multiple>
                             </div>
                         </div>
+                        <% } %>
                     </div> <!-- card end// -->
               
             </div>

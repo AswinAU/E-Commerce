@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:35 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/public/admin-assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/public/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="/admin/adminHome" class="brand-wrap">
+                <img src="/public/admin-assets/imgs/theme/logo.svg" class="logo" alt="Admin">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/adminHome"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="/admin/add-product">Add product</a>
+                        <a href="/admin/all-products">view products</a>
+                        <!-- <a href="page-products-grid-2.html">Product grid 2</a> -->
+                        <a href="/admin/category">Categories</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu active">
+                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Coupens</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="/admin/add-Coupon">Add Coupens</a>
+                        <a href="/admin/coupon">View Coupens</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="/admin/order-list">Order list</a>
+                        <!-- <a href="page-orders-2.html">Order list 2</a>
+                        <a href="page-orders-detail.html">Order detail</a> -->
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Users</span>
+                    </a>
+                    <div class="submenu">
+                        <!-- <a href="page-sellers-cards.html">Sellers cards</a> -->
+                        <a href="/admin/userslist">users list</a>
+                        <!-- <a href="page-seller-detail.html">Seller profile</a> -->
+                    </div>
+                </li>
+                
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Account</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-account-login.html">User login</a>
+                        <a href="page-account-register.html">User registration</a>
+                        <a href="page-error-404.html">Error 404</a>
+                    </div>
+                </li>
+                
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-settings-1.html">Setting sample 1</a>
+                        <a href="page-settings-2.html">Setting sample 2</a>
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
+                        <span class="text"> Starter page </span>
+                    </a>
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                            <a class="dropdown-item text-brand" href="#"><img src="/public/admin-assets/imgs/theme/flag-us.png" alt="English">English</a>
+                            <a class="dropdown-item" href="#"><img src="/public/admin-assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                            <a class="dropdown-item" href="#"><img src="/public/admin-assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="#"><img src="/public/admin-assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                        </div>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/public/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header col-8">
+                <h2 class="content-title">Add New Coupon</h2>
+                <div>
+                    <form action="/admin/addcoupon" method="post" onsubmit="return validateForm();">
+
+                        <button type="submit" class="btn btn-md rounded font-sm hover-up">Add Coupon</button>
+                   
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="product_title" class="form-label">code</label>
+                            <input type="number" placeholder="Type here" name="code" class="form-control" id="product_title">
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_title" class="form-label">Coupon name</label>
+                            <input type="text" placeholder="Type here" name="name" class="form-control" id="product_title">
+                        </div>
+                        <div class="row gx-3">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Description</label>
+                                <input type="text" placeholder="Type here" name="discription" class="form-control" id="product_title">
+                            </div>
+                            <div class="col-md-4  mb-3">
+                                <label for="product_color" class="form-label">Offer Price</label>
+                                <input type="number" placeholder="Type here" name="offerPrice" class="form-control" id="product_color">
+                            </div>
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label">Min Amount</label>
+                                <input type="number" name="minimumAmount" placeholder="Type here" class="form-control" id="product_size">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_brand" class="form-label">Expiry Date</label>
+                            <input type="date" placeholder="Type here" name="expiryDate" class="form-control" id="product_brand">
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+            </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+    function validateForm() {
+        // Reset any existing error messages
+        clearErrorMessages();
+
+        const name = document.getElementsByName('name')[0].value;
+        const discription = document.getElementsByName('discription')[0].value;
+        const offerPrice = document.getElementsByName('offerPrice')[0].value;
+        const minimumAmount = document.getElementsByName('minimumAmount')[0].value;
+        const expiryDate = document.getElementsByName('expiryDate')[0].value;
+
+        let isValid = true; // Assume the form is valid by default
+
+        // Check if name is empty
+        if (name.trim() === '') {
+            displayErrorMessage('name', 'Please enter a coupon name.');
+            isValid = false;
+        }
+
+        // Check if description is empty
+        if (discription.trim() === '') {
+            displayErrorMessage('description', 'Please enter a description.');
+            isValid = false;
+        }
+
+        // Check if offerPrice is a non-negative number
+        if (!/^\d+(\.\d{1,2})?$/.test(offerPrice) || parseFloat(offerPrice) < 0) {
+            displayErrorMessage('offerPrice', 'Please enter a valid non-negative offer price.');
+            isValid = false;
+        }
+
+        // Check if minimumAmount is a non-negative number
+        if (!/^\d+(\.\d{1,2})?$/.test(minimumAmount) || parseFloat(minimumAmount) < 0) {
+            displayErrorMessage('minimumAmount', 'Please enter a valid non-negative minimum amount.');
+            isValid = false;
+        }
+
+        // Check if expiryDate is empty
+        if (expiryDate.trim() === '') {
+            displayErrorMessage('expiryDate', 'Please select an expiry date.');
+            isValid = false;
+        }
+
+        return isValid; // Form is valid
+    }
+
+    function displayErrorMessage(fieldName, message) {
+        const field = document.getElementsByName(fieldName)[0];
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerText = message;
+        field.parentNode.appendChild(errorDiv);
+    }
+
+    function clearErrorMessages() {
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach((errorMessage) => {
+            errorMessage.parentNode.removeChild(errorMessage);
+        });
+    }
+</script>
+
+<footer class="main-footer font-xs">
+    <div class="row pb-30 pt-15">
+        <div class="col-sm-6">
+            <script>
+            document.write(new Date().getFullYear())
+            </script> ©, Evara - HTML Ecommerce Template .
+        </div>
+        <div class="col-sm-6">
+            <div class="text-sm-end">
+                All rights reserved
+            </div>
+        </div>
+    </div>
+</footer>
+</main>
+<script src="/public/admin-assets/js/vendors/jquery-3.6.0.min.js"></script>
+<script src="/public/admin-assets/js/vendors/bootstrap.bundle.min.js"></script>
+<script src="/public/admin-assets/js/vendors/select2.min.js"></script>
+<script src="/public/admin-assets/js/vendors/perfect-scrollbar.js"></script>
+<script src="/public/admin-assets/js/vendors/jquery.fullscreen.min.js"></script>
+<script src="/public/admin-assets/js/vendors/chart.js"></script>
+<!-- Main Script -->
+<script src="/public/admin-assets/js/main.js" type="text/javascript"></script>
+<script src="/public/admin-assets/js/custom-chart.js" type="text/javascript"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:57 GMT -->
+</html>

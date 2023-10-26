@@ -3,6 +3,7 @@ const config = require("../config/config");
 const session = require("express-session");
 // const bodyparser = require("body-parser");
 const adminController = require("../controllers/adminController");
+const couponController = require("../controllers/couponController");
 const auth = require("../middleware/adminAuth");
 const valid = require('../middleware/imageValidation');
 const categoryController = require("../controllers/categoryControler");
@@ -76,8 +77,15 @@ admin_route.get("/order-detail/:id", auth.isLogin,adminController.orderDetail)
 admin_route.post("/change-order-status", auth.isLogin,adminController.changeStatus)
 
 //coupens
-admin_route.get("/add-Coupon", auth.isLogin,adminController.addcoupon);
-admin_route.post('/addcoupon', auth.isLogin,adminController.addcouponpost);
+//admin_route.get("/add-Coupon", auth.isLogin,adminController.addcoupon);
+//admin_route.post('/addcoupon', auth.isLogin,adminController.addcouponpost);
+admin_route.get("/add-Coupon", auth.isLogin,couponController.loadCoupon);
+admin_route.post("/addCoupon", auth.isLogin,couponController.addCoupon);
+admin_route.get("/coupon", auth.isLogin,couponController.coupon);
+
+admin_route.get("/deleteCoupon", auth.isLogin,couponController.deleteCoupon);
+admin_route.get("/editCoupon", auth.isLogin,couponController.editCoupon);
+admin_route.post("/updateCoupon", auth.isLogin,couponController.updateCoupon);
 
 
 admin_route.use(errorHandler)

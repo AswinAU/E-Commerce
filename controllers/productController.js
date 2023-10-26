@@ -82,69 +82,53 @@ showAddProduct: async (req, res, next) => {
   //product ///
   editProduct: async (req, res, next) => {
     try {
-      console.log(req.files);
-      console.log(req.body);
+        const id = req.params.id;
+        const { name, description, regular_price, sale_price, quantity, gst, category } = req.body;
+        const size = req.body.size; // Assuming size is passed in the request body
 
-      var id = req.params.id;
-      console.log(id);
-      var size = req.body.size;
-      console.log(req.files);
-      if (req.files.length !== 0) {
-        console.log(";hehehehehhe");
-        await productModel.findByIdAndUpdate(
-          id,
-          {
-            name: req.body.name,
-            description: req.body.description,
-            regularprice: req.body.regularprice,
-            saleprice: req.body.saleprice,
-            quantity: req.body.quantity,
-            gst: req.body.gst,
-            size: size,
-            category: req.body.category,
-            images: [
-              req.files[0].filename,
-              req.files[1].filename,
-              req.files[2].filename,
-              req.files[3].filename,
-            ],
-          },
-          { new: true }
-        );
+        if (req.files && req.files.length > 0) {
+            // If new images are uploaded, update the product with new images
+            const images = req.files.map(file => file.filename);
+
+            await productModel.findByIdAndUpdate(
+                id,
+                {
+                    name,
+                    description,
+                    regular_price,
+                    sale_price,
+                    quantity,
+                    gst,
+                    size,
+                    category,
+                    images
+                },
+                { new: true }
+            );
+        } else {
+            // If no new images are uploaded, update the product without changing the images
+            await productModel.findByIdAndUpdate(
+                id,
+                {
+                    name,
+                    description,
+                    regular_price,
+                    sale_price,
+                    quantity,
+                    gst,
+                    size,
+                    category
+                },
+                { new: true }
+            );
+        }
+
         res.redirect("/admin/all-products");
-      } else {
-        console.log("heloooooooooooo");
-        console.log(req.body.sale_price);
-        console.log(id);
-        let user = await productModel.findById(id);
-        console.log(user);
-        let product = await productModel.findByIdAndUpdate(
-          id,
-          {
-            name: req.body.name,
-            description: req.body.description,
-            regular_price: req.body.regular_price,
-            sale_price: req.body.sale_price,
-            units: req.body.unit,
-            taxrate: req.body.taxrate,
-            quantity: req.body.quantity,
-            size: size,
-            category: req.body.category,
-            // images: [
-            //   req.files[0].filename,
-            //   req.files[1].filename,
-            //   req.files[2].filename,
-            //   req.files[3].filename,
-            // ],
-          },
-          { new: true }
-        );
-        res.redirect("/admin/all-products");
-      }
     } catch (err) {
-      next(err);
+        next(err);
     }
-  },
+},
+
 
   //productDetails
   productDetails:async(req, res, next)=>{
