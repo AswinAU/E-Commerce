@@ -281,25 +281,26 @@
                                             <th width="20%"><%=data.items[i].quantity%></th>
                                             <th width="20%" class="text-end"><%=data.items[i].price*data.items[i].quantity%></th>
                                         </tr>
-                                        
+                                        <%}%>
                                      </thead>
+
                                    
                                         <tr> 
                                             <td colspan="4">
                                                 <article class="float-end">
-                                                    <dl class="dlist">
+                                                    <!-- <dl class="dlist">
                                                         <dt>Subtotal:</dt>
                                                         <dd><%=(data.items[0].price*data.items[0].quantity)%></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>discount:</dt>
                                                         <dd><%=(data.items[0].price*data.items[0].quantity) - data.finalAmount%></dd>
-                                                    </dl>
+                                                    </dl> -->
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
                                                         <dd> <b class="h5"><%=data.finalAmount%></b> </dd>
                                                     </dl>
-                                                    <%}%>
+                                                    
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>

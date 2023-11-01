@@ -134,14 +134,8 @@
     <script>
 
         function changeQuantity(userId, proId, count, quantity) {
-
-alert(count)
-alert(quantity)
-alert(proId)
-
-
             const qty = document.getElementById(proId)
-            alert(qty.value)
+            
 
             if (qty.value > 1 || count == 1) {
 
@@ -153,36 +147,32 @@ alert(proId)
                         timer: 5000
                     })
                 } else {
-                    alert('in this else')
+                    
 
 
                     qty.value = Number(qty.value) + count
-alert( qty.value)
                     const sub = document.getElementById(`${proId}pro-total`)
-                    alert(sub)
+                    
                     const subPrice = document.getElementById(`${proId}price`)
-                    alert(subPrice)
+                    
                     sub.textContent = qty.value * subPrice.textContent
-                    alert(sub.textContent)
+                   
 
 
 
 
                     const items = document.querySelectorAll(".item-total")
-                    alert(items)
+                    
                     const final = document.querySelector("#final-amount")
-                    alert('hdf;kasjdfh;ksdfjha;')
-                    alert(final)
+                    
                     let amt = 0
                     items.forEach(item => {
                         amt += Number(item.innerText)
                     })
                     final.innerText = amt
-alert(final.innerText)
-
 
                     let quantity = qty.value - count
-alert(quantity)
+
                     $.ajax({
                         url: "/change-quantity",
                         method: 'post',
@@ -197,13 +187,8 @@ alert(quantity)
                             console.log(response.status)
 
                             if (response.status == true) {
-                                alert('haiu')
                                 var totalInput = document.getElementsByName('total')[0];
-                                alert(totalInput.value)
                                 totalInput.value = final.innerText
-                                alert(totalInput.value)
-                                alert('sucesss')
-                                
                                 // location.reload();
                             } else {
                                

@@ -16,36 +16,6 @@ const loadLogin = async (req, res, next) => {
 };
 
 // login verification
-// const verifyLogin = async (req, res, next) => {
-//   try {
-//     const email = req.body.email;
-//     const password = req.body.password;
-//     const userData = await user.findOne({ email: email, is_admin: 1 });
-//     console.log(userData);
-//     if (userData) {
-//       const passwordMatch = await bcrypt.compare(password, userData.password);
-
-//       if (passwordMatch) {
-//         if (userData.is_admin == 0) {
-//           res.render("adminLogin", {
-//             message: "email and password is incorrect",
-//           });
-//         } else {
-//           req.session.user_id = userData._id;
-//           res.redirect("/admin/adminHome");
-//         }
-//       } else {
-//         res.render("adminLogin", {
-//           message: "email and password is incorrect",
-//         });
-//       }
-//     } else {
-//       res.render("adminLogin", { message: "email and password is incorrect" });
-//     }
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 const verifyLogin = async (req, res, next) => {
   try {
     const email = req.body.email;
@@ -99,7 +69,7 @@ const loadDashboard = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     req.session.destroy();
-    res.redirect("/adminLogin");
+    res.redirect("/admin");
   } catch (error) {
     next(err);
   }
@@ -130,7 +100,6 @@ const userslist = async (req, res, next) => {
 const blockUser = async (req, res, next) => {
   try {
     const { userId } = req.body; // Extract userId from request body
-    console.log(userId, 'User ID');
     
     // Assuming `user` is your Mongoose model, make sure to pass `userId` as an ObjectId
     // Update the user's verification status in the database
@@ -148,7 +117,6 @@ const blockUser = async (req, res, next) => {
 const unblockUser = async (req, res, next) => {
   try {
     const { userId } = req.body; // Extract userId from request body
-    console.log(userId, 'User ID');
 
     // Assuming `user` is your Mongoose model, make sure to pass `id` as an ObjectId
     // Update the user's verification status in the database
@@ -164,7 +132,6 @@ const unblockUser = async (req, res, next) => {
 
 
 // orders listing in admin side
-
 const ShowOrders = async (req, res, next) => {
   try {
     let doc = await orderModel.aggregate([
@@ -228,9 +195,7 @@ const orderDetail = async (req, res) => {
       .findById(orderId)
       .lean()
       .populate("items.product", "name price"); // Assuming 'items.product' is the reference to the 'Product' model
-    console.log("this is poducts ", order.items);
     const productName = order.items[0].product.name;
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", productName);
 
     if (!order) {
       return res.status(404).send("Order not found");
@@ -251,7 +216,6 @@ const changeStatus = (req, res, next) => {
     orderModel
       .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
       .then((status) => {
-        console.log(status);
         res.json(true);
       })
       .catch((err) => {
@@ -264,41 +228,6 @@ const changeStatus = (req, res, next) => {
   }
 };
 
-//coupen
-// const addcoupon = async (req, res, next) => {
-//   console.log(req.body);
-//   try {
-//     couponModel.find({}).then((data) => {
-//       data.reverse();
-//       const itemsperpage = 3;
-//       const currentpage = parseInt(req.query.page) || 1;
-//       const startindex = (currentpage - 1) * itemsperpage;
-//       const endindex = startindex + itemsperpage;
-//       const totalpages = Math.ceil(data.length / 3);
-//       const currentproduct = data.slice(startindex, endindex);
-//       res.render("addcoupon", {
-//         data: currentproduct,
-//         totalpages,
-//         currentpage,
-//       });
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const addcouponpost = async (req, res, next) => {
-//   console.log("kkkkkkkkkkkkkkkkkkkkkkkkkk");
-//   try {
-//     console.log(req.body);
-//     let coupon = req.body;
-//     await couponModel.create(coupon);
-//     res.redirect("back");
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 module.exports = {
   loadLogin,
   verifyLogin,
@@ -310,6 +239,5 @@ module.exports = {
   ShowOrders,
   orderDetail,
   changeStatus,
-  //addcoupon,
-  //addcouponpost,
+
 };

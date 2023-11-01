@@ -297,7 +297,7 @@
                                     <img src="/upload/product/<%= data[0].images[i] %>" alt="Product Image <%= i + 1 %>">
                                
                                 <!-- <img src="/upload/product/<%=data[0].images%>" alt=""> -->
-                                <input name="image" class="form-control"value="<%=data[0].images%>" type="file" multiple>
+                                <input name="image" class="form-control"value="<%=data[0].images%>" accept="image/*"  type="file" multiple>
                             </div>
                         </div>
                         <% } %>

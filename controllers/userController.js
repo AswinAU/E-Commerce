@@ -13,7 +13,6 @@ const mongoose = require("mongoose");
 const mongodb = require("mongodb");
 const easyinvoice = require("easyinvoice");
 const { Readable } = require("stream");
-//const adminCategories=require("../view/admin/page-categories");
 
 // load landing-page
 const loadHome = async (req, res, next) => {
@@ -34,9 +33,7 @@ const loadRegister = async (req, res, next) => {
 };
 
 //user registration
-
 const objj = {};
-
 const otppage = async (req, res) => {
   try {
     res.render("otp", { userId: req.query.id });
@@ -45,6 +42,7 @@ const otppage = async (req, res) => {
   }
 };
 
+//user insertion 
 const insertUser = async (req, res, next) => {
   try {
     const { name, email, password, repeatPassword, otp } = req.body;
@@ -90,10 +88,10 @@ const insertUser = async (req, res, next) => {
       repeatPassword: spassword,
       is_admin: 0,
     });
-
+    
     // Save the user to the database
     const userData = await newUser.save();
-
+    //generate otp and send verification mail
     if (userData) {
       const otp = randomString.generate({ length: 4, charset: "numeric" });
       objj.OTP = otp;
@@ -103,23 +101,10 @@ const insertUser = async (req, res, next) => {
     } else {
       res.render("registration", { message: "your registerarion Failed" });
     }
+
   } catch (err) {
     // Handle errors
     next(err);
-  }
-};
-
-const recentOpt = async (req, res) => {
-  try {
-    const userId = req.query.userId.trim();
-    const otp = randomString.generate({ length: 4, charset: "numeric" });
-    objj.OTP = otp;
-    console.log("recent", objj.OTP);
-    await sendVerifyMail(req.body.name, req.body.email, otp);
-    const userData = await user.findOne({ _id: userId });
-    res.redirect(`otp?id=${userData._id}`);
-  } catch (error) {
-    console.log(error.message);
   }
 };
 
@@ -136,7 +121,6 @@ const securePassword = async (password) => {
 // mail verification
 const sendVerifyMail = async (name, email, otp) => {
   try {
-    console.log("sendemail");
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -172,17 +156,30 @@ const sendVerifyMail = async (name, email, otp) => {
   }
 };
 
+//Resend otp
+const resendOtp = async (req, res) => {
+  try {
+    const userId = req.query.userId.trim();
+    const otp = randomString.generate({ length: 4, charset: "numeric" });
+    objj.OTP = otp;
+    console.log("recent", objj.OTP);
+    await sendVerifyMail(req.body.name, req.body.email, otp);
+    const userData = await user.findOne({ _id: userId });
+    res.redirect(`otp?id=${userData._id}`);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 //otp verification
 const validateOtp = async (req, res) => {
   try {
     const formdata = req.body.otp1;
-    console.log("Received form data:", formdata);
     const otp1 = req.body.otp1;
     const otp2 = req.body.otp2;
     const otp3 = req.body.otp3;
     const otp4 = req.body.otp4;
     const Newopt = otp1 + otp2 + otp3 + otp4;
-    console.log("newOtp :-", Newopt);
 
     if (objj.OTP === Newopt) {
       delete objj.OTP;
@@ -190,10 +187,10 @@ const validateOtp = async (req, res) => {
 
       const udpateinfo = await user.updateOne(
         { _id: id },
-        { $set: { is_verified: 0 } }
+        { $set: { is_verified: 1 } }
       );
 
-      res.redirect("userHome");
+      res.redirect("/login");
     }
   } catch (error) {
     console.log(error.message);
@@ -214,7 +211,6 @@ const loginLoad = async (req, res, next) => {
 };
 
 // login verification
-
 const verifyLogin = async (req, res, next) => {
   try {
     const email = req.body.email;
@@ -232,14 +228,13 @@ const verifyLogin = async (req, res, next) => {
     }
 
     const userData = await user.findOne({ email: email, is_verified: 1 });
-    
 
     if (userData) {
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
       if (passwordMatch) {
         req.session.user = userData._id;
-        
+
         req.session.isLoggedIn = true;
         res.redirect("/userHome");
       } else {
@@ -253,7 +248,7 @@ const verifyLogin = async (req, res, next) => {
   }
 };
 
-//load-login-userhome
+//load-userhome
 const loadLogin = async (req, res, next) => {
   try {
     res.render("userHome", { log: req.session.isLoggedIn });
@@ -278,7 +273,6 @@ const shopLoad = async (req, res, next) => {
     if (!req.session.isLoggedIn) {
       res.redirect("/login");
     } else {
-      console.log("Enered");
       await productModel
         .find()
         .lean()
@@ -289,8 +283,6 @@ const shopLoad = async (req, res, next) => {
           const endindex = startindex + itemsperpage;
           const totalpages = Math.ceil(data.length / 6);
           const currentproduct = data.slice(startindex, endindex);
-          console.log(data);
-          console.log(data.length);
           res.render("Shop", {
             data,
             log: req.session.isLoggedIn,
@@ -305,24 +297,12 @@ const shopLoad = async (req, res, next) => {
   }
 };
 
-//whishlist
-// const whishList = async (req, res, next) => {
-//   try {
-//     res.render("whishList", { log: req.session.isLoggedIn });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// };
-
 //myProfile
 const profile = async (req, res, next) => {
   try {
-    var userdata = await req.session.user;
+    let userdata = await req.session.user;
     user.findById(userdata).then((data) => {
       res.render("myProfile", { data, userdata, log: req.session.isLoggedIn });
-      console.log(data, "mmmmmmmmmmmmm");
     });
   } catch (err) {
     next(err);
@@ -343,9 +323,7 @@ const addressForm = async (req, res, next) => {
 //add-address
 const confirmAddress = async (req, res, next) => {
   try {
-    var id = req.session.user;
-    console.log(id);
-    console.log("hhhhhhhhhhhhhhhhhhhhh");
+    let id = req.session.user;
 
     await user.findByIdAndUpdate(
       { _id: id },
@@ -378,14 +356,10 @@ const editAddress = async (req, res, next) => {
     const ad = req.query.id;
     const login = req.session.user;
     const oid = new mongodb.ObjectId(login);
-
-    console.log(ad, "lllllllllllllllll");
     const profile = await user.findById(login);
-    console.log(profile, "prrrrrr");
     const userAddress = profile.address.id(ad);
 
     res.render("editaddress", { userAddress, log: req.session.isLoggedIn });
-    console.log(userAddress, "adddddddd");
   } catch (err) {
     next(err);
   }
@@ -395,10 +369,7 @@ const editAddress = async (req, res, next) => {
 const confirmEdit = async (req, res, next) => {
   try {
     const quer = req.query.id;
-    console.log(quer, "helllllllllllll");
-
-    var id = req.session.user;
-    console.log(id);
+    let id = req.session.user;
     const User = await user.findById(id);
     const address = User.address.id(quer);
     address.set({
@@ -422,9 +393,7 @@ const confirmEdit = async (req, res, next) => {
 
 // address deletion
 const removeAddres = async (req, res, next) => {
-  console.log("hellllllllllllllll");
   id = req.session.user;
-  console.log(id);
 
   const profile = await user.findById(id);
   profile.address.pull(req.body.addressId);
@@ -436,7 +405,6 @@ const removeAddres = async (req, res, next) => {
 const products = async (req, res, next) => {
   try {
     productModel.find({}).then((data) => {
-      console.log(data);
       res.render("Shop", { data });
     });
   } catch (err) {
@@ -444,24 +412,19 @@ const products = async (req, res, next) => {
   }
 };
 
-// checkout from cart
-
+// load checkout 
 const checkout = async (req, res, next) => {
   try {
     const coupon = await coupounModel.find({
       minimumAmount: { $lte: req.body.total },
     });
-    console.log(coupon);
-    console.log(req.session.user, "oooo");
     user.find({ _id: req.session.user }).then((data) => {
-      console.log(data, "dtaaa");
       res.render("checkOut1", {
         data: data,
         total: req.body.total,
         coupon,
         log: req.session.isLoggedIn,
       });
-      console.log(data, "checkoutooooooooooooo");
     });
   } catch (err) {
     next(err);
@@ -469,15 +432,10 @@ const checkout = async (req, res, next) => {
 };
 
 // confirmation of order
-
 const confirmation = async (req, res, next) => {
   try {
-    console.log(req.body);
-
     const status = req.body.payment;
-
     const userData = await user.findById(req.session.user);
-    console.log(userData, "00000");
     const items = [];
 
     let canPlaceOrder = true; // Initialize a flag to check if the order can be placed
@@ -486,15 +444,9 @@ const confirmation = async (req, res, next) => {
       const product = await productModel.findById(userData.cart[i].productId);
 
       if (product) {
-        console.log(product, "producttttt");
         if (product.quantity < 1) {
-          console.log(
-            product.quantity,
-            "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
-          );
           canPlaceOrder = false; // Product quantity is below 1, cannot place the order
           console.error(`Product with ID ${product._id} has quantity below 1.`);
-
           break; // Exit the loop when a product quantity is below 1
         } else {
           const temp = {
@@ -509,8 +461,6 @@ const confirmation = async (req, res, next) => {
             { $inc: { quantity: -parseInt(temp.quantity, 10) } },
             { new: true }
           );
-
-          console.log(updatedDetails, "Updated Product Details");
         }
       } else {
         // Handle the case where the product doesn't exist
@@ -521,7 +471,6 @@ const confirmation = async (req, res, next) => {
     }
 
     if (!canPlaceOrder) {
-      console.log("chkk canPlaceOrder");
       // Redirect back when a product quantity is below 1
       res.redirect("/checkOut1"); // Replace with your desired redirection path
       return; // Exit the function early
@@ -537,23 +486,17 @@ const confirmation = async (req, res, next) => {
       finalAmount: req.body.GrandTotal,
     });
 
-    console.log(order, "Order Created");
-
     if (order.paymentMode === "cod") {
-      console.log("COD: " + order.paymentMode);
       id = req.session.user;
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
         .then((data) => {
-          console.log("cart deleted");
         })
         .catch((err) => {
-          console.log("cart not deleted");
         });
 
       res.json({ payment: true, method: "cod", order: order });
     } else if (order.paymentMode === "online") {
-      console.log("onlineeeeeeeeeeeeeeeeee");
       const generatedOrder = await generateOrderRazorpay(
         order._id,
         req.body.GrandTotal
@@ -570,10 +513,8 @@ const confirmation = async (req, res, next) => {
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
         .then((data) => {
-          console.log("cart deleted");
         })
         .catch((err) => {
-          console.log("cart not deleted");
         });
 
       await user
@@ -598,21 +539,20 @@ const confirmation = async (req, res, next) => {
   }
 };
 
-
+//RazorPay 
 const Razorpay = require("razorpay");
 const { Transaction } = require("mongodb");
 const userModel = require("../model/userModel");
 const { log } = require("console");
 //const { default: orders } = require("razorpay/dist/types/orders");
-// const { default: items } = require("razorpay/dist/types/items");
 const instance = new Razorpay({
   key_id: "rzp_test_7dQjySZBDhgXXu",
   key_secret: "j6bRLlKZCjqKXeZ9iC1i2Iz8",
 });
 
+//generate razor-pay order
 const generateOrderRazorpay = (orderId, total) => {
   return new Promise((resolve, reject) => {
-    console.log(total, "totallll");
     const options = {
       amount: total * 100, // amount in the smallest currency unit
       currency: "INR",
@@ -620,7 +560,6 @@ const generateOrderRazorpay = (orderId, total) => {
     };
     instance.orders.create(options, function (err, order) {
       if (err) {
-        console.log("failed");
         console.log(err);
         reject(err);
       } else {
@@ -631,19 +570,17 @@ const generateOrderRazorpay = (orderId, total) => {
   });
 };
 
+//verify razor-pay payment
 const verifyRazorpayPayment = (req, res, next) => {
   try {
     verifyOrderPayment(req.body)
       .then(async () => {
-        console.log("Payment SUCCESSFUL");
         id = req.session.user;
         await user
           .findByIdAndUpdate(id, { $set: { cart: [] } })
           .then((data) => {
-            console.log("cart deleted");
           })
           .catch((err) => {
-            console.log("cart not deleted");
           });
 
         res.json({ status: true });
@@ -658,6 +595,7 @@ const verifyRazorpayPayment = (req, res, next) => {
   }
 };
 
+//verify order
 const verifyOrderPayment = (details) => {
   console.log("DETAILS : " + JSON.stringify(details));
   return new Promise((resolve, reject) => {
@@ -670,30 +608,16 @@ const verifyOrderPayment = (details) => {
     );
     hmac = hmac.digest("hex");
     if (hmac == details.payment.razorpay_signature) {
-      console.log("Verify SUCCESS");
       resolve();
     } else {
-      console.log("Verify FAILED");
       reject();
     }
   });
 };
 
-const userProfile = async (req, res, next) => {
-  try {
-    var userdata = await req.session.user;
-    user.findById(userdata).then((data) => {
-      res.render("myProfile", { data, log: req.session.isLoggedIn, userdata });
-      console.log(data, "mmmmmmmmmmmmm");
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
+//show-orders
 const ShowOrders = async (req, res, next) => {
   try {
-    
     const oid = new mongodb.ObjectId(req.query.id);
     const orders = await orderModel.aggregate([
       { $match: { user: oid } },
@@ -727,8 +651,6 @@ const ShowOrders = async (req, res, next) => {
     const totalpages = Math.ceil(orders.length / 5);
     const currentproduct = orders.slice(startindex, endindex);
     let userData = req.session.user;
-    console.log(userData,'userdatttaaaaaaaaaaaa');
-    console.log("Current products", currentproduct);
     res.render("orderlist", {
       orders: currentproduct,
       totalpages,
@@ -736,20 +658,18 @@ const ShowOrders = async (req, res, next) => {
       userData,
       log: req.session.isLoggedIn,
     });
-    console.log(orders, "orrrrrrrrrrrr");
   } catch (err) {
     next(err);
     res.send("Error");
   }
 };
 
+//order-details
 const orderDetails = async (req, res, next) => {
   try {
-    console.log(req.query.id);
     const oid = new mongodb.ObjectId(req.query.id);
 
     const user = req.session.user;
-    console.log(user);
     const orders = await orderModel.aggregate([
       { $match: { _id: oid } },
       { $unwind: "$items" },
@@ -782,7 +702,6 @@ const orderDetails = async (req, res, next) => {
       userData,
       log: req.session.isLoggedIn,
     });
-    console.log(orders, "orrrrrrrrrrrr");
   } catch (err) {
     next(err);
   }
@@ -808,9 +727,9 @@ const changeStatus = (req, res, next) => {
   }
 };
 
+//add to wallet
 const addToWallet = async (req, res, amount, transactionType) => {
-  var id = req.session.user;
-  console.log(id);
+  let id = req.session.user;
 
   await user
     .findByIdAndUpdate(id, {
@@ -827,7 +746,6 @@ const addToWallet = async (req, res, amount, transactionType) => {
 const wallet = (req, res, next) => {
   try {
     const userId = req.session.user;
-    console.log(userId);
     user.findById(userId).then((data) => {
       data.wallet.reverse();
 
@@ -839,7 +757,6 @@ const wallet = (req, res, next) => {
       const currentproduct = data.wallet.slice(startindex, endindex);
       console.log("Current products : ", currentproduct);
 
-      console.log(totalpages);
       res.render("wallet", {
         log: req.session.isLoggedIn,
         data: currentproduct,
@@ -852,25 +769,10 @@ const wallet = (req, res, next) => {
   }
 };
 
-// const checkCoupon = async (req, res, next) => {
-//   try {
-//     const discountValue = req.body.discount;
-//     console.log(req.body, "requestttt");
-
-//     const coupon = await coupounModel.find({
-//       code: discountValue.toLowerCase(),
-//     });
-//     console.log(coupon, "coouuppeennnn");
-//     res.json({ coupon });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 //category
 const subCategory = async (req, res, next) => {
   const category = await catMOdel.find().lean();
-  console.log(req.query.cat);
+  
   await productModel
     .find({ category: req.query.cat })
     .lean()
@@ -897,6 +799,7 @@ const subCategory = async (req, res, next) => {
     });
 };
 
+//filer by price
 const priceFilter = async (req, res, next) => {
   try {
     const priceRange = req.body.priceRange;
@@ -910,7 +813,6 @@ const priceFilter = async (req, res, next) => {
         ],
       })
       .lean();
-    console.log(filteredProducts, "filteredProducts");
 
     const itemsPerPage = 8;
     const currentPage = parseInt(req.query.page) || 1;
@@ -931,6 +833,7 @@ const priceFilter = async (req, res, next) => {
   }
 };
 
+//filter 
 const filteredProducts = async (req, res, next) => {
   try {
     if (!req.session.isLoggedIn) {
@@ -958,7 +861,6 @@ const filteredProducts = async (req, res, next) => {
           data: currentProducts,
           currentpage: currentPage,
           totalpages: totalPages,
-          
         });
       } else {
         // Handle case where there is no filtered data available
@@ -976,63 +878,46 @@ const filteredProducts = async (req, res, next) => {
   }
 };
 
-
+//search products by name
 const searchProd = async (req, res, next) => {
   try {
-    console.log(req.body.search,'testttttttttttttttt');
+    
     let data = await productModel.find({
       name: { $regex: `${req.body.search}`, $options: "i" },
     });
-    console.log(req.body.search,'testttttttttttttttt');
-    console.log(data,'dattaaaaaaaaaaaa');
-    res.render("Shop", { data,log: req.session.isLoggedIn, });
+    res.render("Shop", { data, log: req.session.isLoggedIn });
   } catch (err) {
     next(err);
   }
 };
 
-
-const orderSucceed = async(req,res, next)=>{
+//order success 
+const orderSucceed = async (req, res, next) => {
   try {
     res.render("ordersucceed", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
-
-const orderFailure = async(req,res, next)=>{
+//order failure
+const orderFailure = async (req, res, next) => {
   try {
     res.render("orderFailure", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 // invoice
-
 const downloadInvoice = async (req, res, next) => {
   try {
     const id = req.query.id;
-    console.log(id, "helllllloooo");
     const userId = req.session.user._id;
     const result = await orderModel.findById(id);
     console.log(result.items[0].product);
     const product = await productModel.findById(result.items[0].product);
-
-    console.log(product, "pd");
-
     const User = await user.findOne({ _id: userId });
-    console.log("USER: ", User);
-    console.log("RESULT: ", result);
-    console.log("helele");
-    //   const address = await User.address.find(
-    //     (element) => {
-    //         console.log(element._id,'plkmjujk')
-    //         console.log(result.address[0]._id,'plkmjujk')
-    //         element._id == result.address[0]._id
-    //     }
-    //   );
 
     const order = {
       _id: id,
@@ -1050,7 +935,7 @@ const downloadInvoice = async (req, res, next) => {
       house: result.address[0].house,
       items: result.items,
     };
-    console.log(order, "orrrrder");
+    
     //set up the product
     const products = order.items.map((items) => ({
       quantity: parseInt(items.quantity),
@@ -1085,9 +970,6 @@ const downloadInvoice = async (req, res, next) => {
         zip: order.pincode,
         city: order.area,
         address: order.name,
-        // "custom1": "custom value 1",
-        // "custom2": "custom value 2",
-        // "custom3": "custom value 3"
       },
       information: {
         // Invoice number
@@ -1118,15 +1000,10 @@ const downloadInvoice = async (req, res, next) => {
   }
 };
 
-
-
-
-
-
 module.exports = {
   loadRegister,
   insertUser,
-  recentOpt,
+  resendOtp,
   loginLoad,
   verifyLogin,
   sendVerifyMail,
@@ -1135,7 +1012,6 @@ module.exports = {
   loadHome,
   logOut,
   shopLoad,
-  //whishList,
   loadLogin,
   products,
   checkout,
@@ -1146,20 +1022,16 @@ module.exports = {
   confirmEdit,
   removeAddres,
   confirmation,
-  userProfile,
   ShowOrders,
   orderDetails,
   changeStatus,
   wallet,
   verifyRazorpayPayment,
-  //checkCoupon,
   subCategory,
   priceFilter,
   filteredProducts,
   searchProd,
   orderSucceed,
   orderFailure,
-  downloadInvoice
-
-  
+  downloadInvoice,
 };

@@ -24,7 +24,7 @@ const loadCoupon=asyncHandler(async(req,res)=>{
 const addCoupon = asyncHandler(async (req, res) => {
     console.log('couupppeennnnnn');
   try {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",req.body);
+      
 
       // Check if required fields are present in the request body
       if (!req.body.name || !req.body.discription || !req.body.offerPrice) {

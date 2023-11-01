@@ -155,7 +155,7 @@
                         <!-- <input type="text" placeholder="Search Categories" class="form-control bg-white"> -->
                         <form action="/admin/searchCat" method="post">
                             <div class="cupon_text d-flex"  >
-                                <input type="text" class="ms-auto " style="width: 20rem;"name="search"  placeholder="search" id="coupon">
+                                <input type="text" class="ms-auto " style="width: 20rem;" name="search"  placeholder="search" id="coupon">
                                 <button class="btn btn-brand " type="submit">search</button>
                             </div>
                         </form>
@@ -186,7 +186,7 @@
                                     </div>
                                     <div class="mb-4">
                                         <label for="image" class="form-label">Cover Image</label>
-                                        <input name="image" type="file" placeholder="Type here" class="form-control" value="<%=data[0].images%>"
+                                        <input name="image" type="file" accept="image/*" placeholder="Type here" class="form-control" value="<%=data[0].images%>"
                                             id="image" />
                                     </div>
 

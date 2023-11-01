@@ -310,8 +310,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data,'dataa')
-            alert(data,'dataa')
+            
           if (data.isValid) {
           
             const displayedSum = document.getElementById('totalValue').textContent;
@@ -381,7 +380,7 @@
 
         <script>
             function makePurchase(GrandTotal) {
-                alert('entered to purchase')
+                
                 var x = document.getElementById('discountAmount').innerText
                 var total = GrandTotal - x
 
