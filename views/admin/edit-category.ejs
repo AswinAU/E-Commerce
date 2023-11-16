@@ -181,20 +181,20 @@
                                     </div>
                                     <div class="mb-4">
                                         <label for="product_slug" class="form-label">Base Price</label>
-                                        <input name="basePrice" type="number" min="0" placeholder="Type here"
-                                            class="form-control" value="<%=data[0].base_price%>" id="base_price" />
+                                        <input name="category_offer_price" type="number" min="0" placeholder="Type here"
+                                            class="form-control" value="<%=data[0].category_offer_price%>" id="base_price" />
                                     </div>
                                     <div class="mb-4">
                                         <label for="image" class="form-label">Cover Image</label>
-                                        <input name="image" type="file" accept="image/*" placeholder="Type here" class="form-control" value="<%=data[0].images%>"
+                                        <input name="image" type="file" accept="image/*" placeholder="Type here" class="form-control" value="<%=data[0].image%>"
                                             id="image" />
                                     </div>
 
-                                    <div class="mb-4">
+                                    <!-- <div class="mb-4">
                                         <label class="form-label">Description</label>
                                         <input name="description" placeholder="Type here" class="form-control" value="<%=data[0].description%>"
                                             />
-                                    </div>
+                                    </div> -->
                                     <div class="d-grid">
                                         <button class="btn btn-primary"    type="submit" >Create category</button>
                                     </div>
@@ -208,7 +208,7 @@
                                                 <th>No</th>
                                                 <th>Image</th>
                                                 <th>Category</th>
-                                                <th>Description</th>
+                                                <!-- <th>Description</th> -->
                                                 <th>Base Price</th>
                                                 <th>Action</th>
                                             </tr>
@@ -226,11 +226,11 @@
                                                     <td>
                                                         <%= data[0].category %>
                                                     </td>
-                                                    <td>
+                                                    <!-- <td>
                                                         <%= data[0].description%>
-                                                    </td>
+                                                    </td> -->
                                                     <td>
-                                                        <%= data[0].base_price%>
+                                                        <%= data[0].category_offer_price%>
                                                     </td>
                                                     <td>
                                                         

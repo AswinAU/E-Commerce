@@ -38,14 +38,14 @@ const orderSchema = new mongoose.Schema({
 	// 	type:mongoose.Schema.ObjectId,
 	// 	ref:'coupon',
 	// },
-    // discount: {
-	// 	type: Number,
-	// 	default: 0,
-	// 	min: 0,
-	// },
     finalAmount: {
 		type: Number,
 		required: true,
+		min: 0,
+	},
+	discount: {
+		type: Number,
+		default: 0,
 		min: 0,
 	},
 	paymentMode: {

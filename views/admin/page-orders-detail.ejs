@@ -32,7 +32,7 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item active">
+                <li class="menu-item ">
                     <a class="menu-link" href="/admin/adminHome"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
@@ -48,7 +48,7 @@
                         <a href="/admin/category">Categories</a>
                     </div>
                 </li>
-                <li class="menu-item has-submenu">
+                <li class="menu-item has-submenu active">
                     <a class="menu-link" href=""> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Orders</span>
                     </a>
@@ -276,7 +276,7 @@
                                         <th>Total</th>
                                         <% for(i=0;i<data.items.length;i++){%>
                                         <tr>
-                                            <th width="40%"><%=data.items[0].product.name%></th>
+                                            <th width="40%"><%=data.items[i].product.name%></th>
                                             <th width="20%"><%=data.items[i].price%></th>
                                             <th width="20%"><%=data.items[i].quantity%></th>
                                             <th width="20%" class="text-end"><%=data.items[i].price*data.items[i].quantity%></th>

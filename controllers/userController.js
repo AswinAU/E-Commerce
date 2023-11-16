@@ -26,6 +26,11 @@ const loadHome = async (req, res, next) => {
 //load register
 const loadRegister = async (req, res, next) => {
   try {
+    // if (req.query.id) {
+    //   req.session.referel = req.query.id;
+    //   console.log(req.session.referel, "sessionnnnn");
+    // }
+    
     res.render("registration", { message: false });
   } catch (err) {
     next(err);
@@ -232,6 +237,53 @@ const verifyLogin = async (req, res, next) => {
     if (userData) {
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
+      // req.session.user = userData;
+      // console.log(req.session.user);
+      // if (req.session.referel) {
+      //   const refererId = req.session.referel;
+      //   const userId = req.session.user;
+      //   const walletUpdateAmount = 200;
+      //   const historyUpdateAmount = 200;
+
+      //   // Update the referer's wallet and push a new history record
+      //   await userModel.findByIdAndUpdate(
+      //     refererId,
+      //     {
+      //       $push: {
+      //         wallet: {
+      //           amount: walletUpdateAmount,
+      //           paymentType: "C",
+      //           timestamp: Date.now(),
+      //         },
+      //         history: {
+      //           amount: historyUpdateAmount,
+      //           paymentType: "Credit",
+      //           timestamp: Date.now(),
+      //         },
+      //       },
+      //     },
+      //     { new: true }
+      //   );
+      //   await userModel.findByIdAndUpdate(
+      //     req.session.user,
+      //     {
+      //       $push: {
+      //         wallet: {
+      //           amount: walletUpdateAmount,
+      //           paymentType: "C",
+      //           timestamp: Date.now(),
+      //         },
+      //         history: {
+      //           amount: historyUpdateAmount,
+      //           paymentType: "Credit",
+      //           timestamp: Date.now(),
+      //         },
+      //       },
+      //     },
+      //     { new: true }
+      //   );
+      // }
+
       if (passwordMatch) {
         req.session.user = userData._id;
 
@@ -425,6 +477,8 @@ const checkout = async (req, res, next) => {
         coupon,
         log: req.session.isLoggedIn,
       });
+      console.log(data[0].cart[0],'datadatadatadata');
+      
     });
   } catch (err) {
     next(err);
@@ -434,6 +488,7 @@ const checkout = async (req, res, next) => {
 // confirmation of order
 const confirmation = async (req, res, next) => {
   try {
+    const discount=req.body.discount;
     const status = req.body.payment;
     const userData = await user.findById(req.session.user);
     const items = [];
@@ -453,6 +508,7 @@ const confirmation = async (req, res, next) => {
             product: product._id,
             quantity: userData.cart[i].quantity,
             price: product.sale_price,
+            discount
           };
           items.push(temp);
 
@@ -476,15 +532,21 @@ const confirmation = async (req, res, next) => {
       return; // Exit the function early
     }
 
+    // let total = req.body.GrandTotal
+    // console.log(total,'totaltotal');
+    console.log(req.body,"BODY>>>>>>>>>>>>>>>>>>>>.");
     const order = await orderModel.create({
       user: req.session.user,
       items,
-      address: userData.address[0],
-      paymentMode: status,
-      discount: req.body.GrandTotal,
-      totalAmount: 0,
+      orderStatus:"pending",
+      totalAmount: '0',
       finalAmount: req.body.GrandTotal,
+      paymentMode: status,
+      address: userData.address[0],
+      discount
+      //discount: req.body.GrandTotal,
     });
+    console.log(order,'orderCreated');
 
     if (order.paymentMode === "cod") {
       id = req.session.user;
@@ -502,11 +564,11 @@ const confirmation = async (req, res, next) => {
         req.body.GrandTotal
       );
       res.json({
-        payment: false,
+        payment: true,
         method: "online",
         razorpayOrder: generatedOrder,
         order: order,
-        total: req.body.GrandTotal,
+        //total: req.body.GrandTotal,
       });
     } else if (order.paymentMode === "wallet") {
       id = req.session.user;
@@ -708,24 +770,68 @@ const orderDetails = async (req, res, next) => {
 };
 
 //order status
-const changeStatus = (req, res, next) => {
+// const changeStatus = (req, res, next) => {
+//   try {
+//     orderModel
+//       .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
+//       .then((order) => {
+//         console.log(req.body,'req.body.status');
+//         console.log(req.body.status,'req.body.status');
+//         addToWallet(req, res, order.totalAmount, "c");
+//         console.log(order);
+//         res.json(true);
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         res.json(false);
+//       });
+//   } catch (err) {
+//     next(err);
+//     res.json(false);
+//   }
+// };
+
+
+
+const changeStatus = async (req, res, next) => {
   try {
-    orderModel
-      .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
-      .then((order) => {
-        addToWallet(req, res, order.totalAmount, "c");
-        console.log(order);
-        res.json(true);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.json(false);
-      });
+    const orderId = req.body.orderId;
+    const newStatus = req.body.status;
+
+    // Find the order by ID
+    const order = await orderModel.findById(orderId);
+
+    if (!order) {
+      return res.json(false); // Order not found, return false
+    }
+
+    // Check if the order status is being changed to 'cancelled'
+    if (order.orderStatus !== ' Order cancelled' && newStatus === ' Order cancelled') {
+      // If the order is being cancelled, restore product quantities
+      for (const item of order.items) {
+        const product = await productModel.findById(item.product);
+        if (product) {
+          // Increment the product quantity by the quantity in the canceled order item
+          product.quantity += item.quantity;
+          await product.save();
+        }
+      }
+    }
+
+    // Update the order status in the database
+    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { orderStatus: newStatus });
+
+    // Perform other logic here (addToWallet or any other operations)
+    addToWallet(req, res, order.totalAmount, "c");
+
+    console.log(updatedOrder);
+    res.json(true);
   } catch (err) {
-    next(err);
+    console.log(err);
     res.json(false);
   }
 };
+
 
 //add to wallet
 const addToWallet = async (req, res, amount, transactionType) => {
@@ -915,13 +1021,15 @@ const downloadInvoice = async (req, res, next) => {
     const id = req.query.id;
     const userId = req.session.user._id;
     const result = await orderModel.findById(id);
-    console.log(result.items[0].product);
-    const product = await productModel.findById(result.items[0].product);
-    const User = await user.findOne({ _id: userId });
+    console.log(result,'result');
+    //const product = await productModel.findById(result.items[0].product);
+    //const product = result.items.map(item => item.product);
 
+    const User = await user.findOne({ _id: userId });
+    
     const order = {
       _id: id,
-      totalAmount: result.totalAmount,
+      totalAmount: result.finalAmount,
       date: result.createdAt, // Use the formatted date
       paymentMethod: result.paymentMode,
       orderStatus: result.orderStatus,
@@ -935,16 +1043,21 @@ const downloadInvoice = async (req, res, next) => {
       house: result.address[0].house,
       items: result.items,
     };
+
+    console.log(order,'orderorderorder');
     
     //set up the product
-    const products = order.items.map((items) => ({
-      quantity: parseInt(items.quantity),
-      description: product.name,
-
-      price: parseInt(product.sale_price),
-      total: parseInt(result.finalAmount),
-      "tax-rate": 0,
+    const products = await Promise.all(order.items.map(async (item) => {
+      const product = await productModel.findById(item.product);
+      return {
+        quantity: parseInt(item.quantity),
+        description: product.name,
+        price: parseInt(product.sale_price),
+        total: parseInt(item.price), // Assuming item.price is the total price for the current item
+        "tax-rate": 0,
+      };
     }));
+    console.log(products,'productsproducts');
     const isoDateString = order.date;
     const isoDate = new Date(isoDateString);
 

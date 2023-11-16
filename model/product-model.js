@@ -22,17 +22,13 @@ let productModel = new mongoose.Schema({
         type:Number,
         requrie:true
     },
+    product_offer_price:{
+        type:Number,
+        require:true
+    },
     created_on:{
         type:Date,
         default:Date.now
-    },
-    unit:{
-        type:String,
-        require:true
-    },
-    gst:{
-        type:Number,
-        require:true,
     },
     images:{
         type:Array,

@@ -209,8 +209,9 @@
 
                                 <div class="mb-4">
                                     <label for="product_brand" class="form-label">Exipiry Date</label>
-                                    <input type="date" placeholder="Type here" value="<%= coupon.expiryDate %>" name="expiryDate" class="form-control" id="product_brand">
+                                    <input type="date" placeholder="Type here" value="<%= coupon.expiryDate.toISOString().substring(0, 10) %>" name="expiryDate" class="form-control" id="product_brand">
                                 </div>
+                                
                             </form>
                             </div>
                         </div> <!-- card end// -->

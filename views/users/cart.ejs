@@ -90,17 +90,17 @@
                                                 <tr>
                                                 <tr>
                                                     <td colspan="3"></td>
-                                        <td class="cart-total">
-                                            <strong>Cart Total</strong> ₹<span id="final-amount">
-                                                <%if(locals.total){%>
-                                                    <%=total%>
-                                                <%}%>
-                                            </span>
-                                        </td>
-                                        <td></td>
+                                                    <td class="cart-total">
+                                                        <strong>Cart Total</strong> ₹<span id="final-amount">
+                                                            <%if(locals.total){%>
+                                                                <%=total%>
+                                                                    <%}%>
+                                                        </span>
+                                                    </td>
+                                                    <td></td>
                                                 </tr>
-                                               
-                                                
+
+
                     </div>
                     </td>
                     </tr>
@@ -115,8 +115,10 @@
 
                         <div class="checkout_btn_inner col-8 col-lg-9 col-md-4 ">
                             <form action="/check-out" method="post">
-                                <input type="hidden" name="total" id="totalInput" <%if(locals.total){%> value="<%=total%>"<%}%>>
-                                <button type="submit" class="btn btn-success w-100 shadow-0 mb-2">proceed to checkout</button>      
+                                <input type="hidden" name="total" id="totalInput" <%if(locals.total){%> value="
+                                <%=total%>"<%}%>>
+                                        <button type="submit" class="btn btn-success w-100 shadow-0 mb-2">proceed to
+                                            checkout</button>
                             </form>
                         </div>
 
@@ -135,7 +137,7 @@
 
         function changeQuantity(userId, proId, count, quantity) {
             const qty = document.getElementById(proId)
-            
+
 
             if (qty.value > 1 || count == 1) {
 
@@ -147,24 +149,28 @@
                         timer: 5000
                     })
                 } else {
-                    
+
 
 
                     qty.value = Number(qty.value) + count
                     const sub = document.getElementById(`${proId}pro-total`)
-                    
+
                     const subPrice = document.getElementById(`${proId}price`)
-                    
+
                     sub.textContent = qty.value * subPrice.textContent
-                   
+
 
 
 
 
                     const items = document.querySelectorAll(".item-total")
-                    
+
                     const final = document.querySelector("#final-amount")
-                    
+
+                    // let finalamount = final.innerHTML;
+                    // alert(finalamount,'finalfinal')
+                    // console.log(finalamount,'final');
+
                     let amt = 0
                     items.forEach(item => {
                         amt += Number(item.innerText)
@@ -183,22 +189,37 @@
                             quantity: quantity,
                         },
                         success: (response) => {
-                         
+
                             console.log(response.status)
 
                             if (response.status == true) {
+
                                 var totalInput = document.getElementsByName('total')[0];
                                 totalInput.value = final.innerText
+                                // alert(totalInput.value,'totalInput.value')
+                                console.log(totalInput.value, 'totalInput.value');
+                                let Total = totalInput.value
                                 // location.reload();
+                                hello(Total)
                             } else {
-                               
+
                                 let total = parseInt(quantity) + parseInt(count);
-                              const h=  document.getElementById(proId).value = total;
+                                const h = document.getElementById(proId).value = total;
 
                             }
                         }
                     })
                 }
+            }
+            function hello(total) {
+
+                $.ajax({
+                    url: "/change-quantity2",
+                    method: 'post',
+                    data: {
+                        finalAmount: total
+                    },
+                })
             }
         }
     </script>
@@ -225,14 +246,30 @@
                         },
                         success: (response) => {
                             if (response == true) {
+                                var totalInput = document.getElementsByName('total')[0];
+                                var totalValue = totalInput.value;
+
+                                //alert(totalValue, 'totalInput.value')
+                                console.log(totalValue, 'totalInput.value');
+                                hello(totalValue)
                                 location.reload()
+
                             } else {
                                 location.reload()
                             }
 
                         }
                     })
+                    function hello(total) {
 
+                        $.ajax({
+                            url: "/change-quantity2",
+                            method: 'post',
+                            data: {
+                                finalAmount: total
+                            },
+                        })
+                    }
 
                 }
             })

@@ -10,7 +10,8 @@ const User=require('../model/userModel')
 //---------------rendering the coupen add page---------------
 const loadCoupon=asyncHandler(async(req,res)=>{
     try {
-        res.render('addCoupon1')
+      const currentPage = '/admin/add-Coupon';
+        res.render('addcoupon1',{currentPage})
         
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion loadCoupon',error);
@@ -22,43 +23,53 @@ const loadCoupon=asyncHandler(async(req,res)=>{
 
 //--------------------cerate a coupen whith coupen ----------------
 const addCoupon = asyncHandler(async (req, res) => {
-    console.log('couupppeennnnnn');
+  console.log('couupppeennnnnn');
   try {
-      
+    // Check if required fields are present in the request body
+    if (!req.body.name || !req.body.discription || !req.body.offerPrice) {
+      throw new Error('Required fields are missing');
+    }
 
-      // Check if required fields are present in the request body
-      if (!req.body.name || !req.body.discription || !req.body.offerPrice) {
-          throw new Error('Required fields are missing');
-      }
+    // Validate if offerPrice is greater than minimumAmount
+    const offerPrice = parseFloat(req.body.offerPrice);
+    const minimumAmount = parseFloat(req.body.minimumAmount);
 
-      let customExpiryDate = new Date(req.body.expiryDate);
+    if (isNaN(offerPrice) || isNaN(minimumAmount) || offerPrice < 0 || minimumAmount < 0 || offerPrice >= minimumAmount) {
+      throw new Error('Invalid offer price or minimum amount And offer price must be less than minimum amount');
+    }
 
-      // Check if customExpiryDate is a valid date
-      if (isNaN(customExpiryDate.getTime())) {
-          // If it's an invalid date, set it to be one month from the current date
-          const currentMonth = new Date().getMonth();
-          const newExpiryDate = new Date();
-          newExpiryDate.setMonth(currentMonth + 1);
-          customExpiryDate = newExpiryDate;
-      }
+    let customExpiryDate = new Date(req.body.expiryDate);
 
-      const coupon = new Coupon({
-          code:req.body.code,
-          name: req.body.name,
-          discription: req.body.discription,
-          offerPrice: req.body.offerPrice,
-          minimumAmount: req.body.minimumAmount,
-          createdOn: Date.now(),
-          expiryDate: customExpiryDate,
-      });
+    // Check if customExpiryDate is a valid date
+    if (isNaN(customExpiryDate.getTime())) {
+      // If it's an invalid date, set it to be one month from the current date
+      const currentMonth = new Date().getMonth();
+      const newExpiryDate = new Date();
+      newExpiryDate.setMonth(currentMonth + 1);
+      customExpiryDate = newExpiryDate;
+    }
 
-      const create = await coupon.save();
+    const coupon = new Coupon({
+      code: req.body.code,
+      name: req.body.name,
+      discription: req.body.discription,
+      offerPrice: offerPrice,
+      minimumAmount: minimumAmount,
+      createdOn: Date.now(),
+      expiryDate: customExpiryDate,
+    });
 
-      res.redirect('/admin/coupon');
+    const create = await coupon.save();
+
+    res.redirect('/admin/coupon');
   } catch (error) {
-      console.log('Error happened in the coupon controller in the function addCoupon', error);
+    console.log('Error happened in the coupon controller in the function addCoupon', error);
+    // Handle error, e.g., display an error message to the user
+    res.status(400).send(error.message);
   }
 });
+
+
 //---------------------------------------------------------
 
 
@@ -83,7 +94,9 @@ const coupon=asyncHandler(async(req,res)=>{
         const totalpages = Math.ceil(coupon.length / 5);
         const currentproduct = coupon.slice(startindex,endindex);
 
-        res.render('coupon',{coupon,currentproduct, totalpages,currentpage})
+        const currentPage = '/admin/coupon';
+
+        res.render('coupon',{coupon,currentproduct, totalpages,currentpage,currentPage})
         
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion coupon',error);
@@ -145,52 +158,51 @@ const editCoupon=asyncHandler(async(req,res)=>{
 
 
 const updateCoupon = asyncHandler(async (req, res) => {
-    try {
-      const id = req.body.id;
-      const x = req.body;
-  
-     
-      if (x.expiryDate) {
-      
-  
-      
-        const updatedCoupon = await Coupon.findByIdAndUpdate(
-          id,
-          {
-            name: x.name,
-            discription: x.discription,
-            offerPrice: x.offerPrice,
-            minimumAmount: x.minimumAmount,
-            expiryDate: x.expiryDate,
-          },
-          { new: true }
-        );
-  
-     
-    
-  
-      
-      } else {
-       
-        const updatedCoupon = await Coupon.findByIdAndUpdate(
-          id,
-          {
-            name: x.name,
-            discription: x.discription,
-            offerPrice: x.offerPrice,
-            minimumAmount: x.minimumAmount,
-          },
-          { new: true }
-        );
-  
-       
-      }
-  
-      res.redirect('/admin/coupon');
-    } catch (error) {
-      console.log('Error happened in the coupon controller in the function editCoupon', error);
+  try {
+    const id = req.body.id;
+    const x = req.body;
+
+    // Validate if offerPrice is greater than minimumAmount
+    const offerPrice = parseFloat(x.offerPrice);
+    const minimumAmount = parseFloat(x.minimumAmount);
+
+    if (isNaN(offerPrice) || isNaN(minimumAmount) || offerPrice < 0 || minimumAmount < 0 || offerPrice >= minimumAmount) {
+      throw new Error('Invalid offer price or minimum amount');
     }
-  });
+
+    if (x.expiryDate) {
+      const updatedCoupon = await Coupon.findByIdAndUpdate(
+        id,
+        {
+          name: x.name,
+          discription: x.discription,
+          offerPrice: offerPrice,
+          minimumAmount: minimumAmount,
+          expiryDate: x.expiryDate,
+        },
+        { new: true }
+      );
+    } else {
+      const updatedCoupon = await Coupon.findByIdAndUpdate(
+        id,
+        {
+          name: x.name,
+          discription: x.discription,
+          offerPrice: offerPrice,
+          minimumAmount: minimumAmount,
+        },
+        { new: true }
+      );
+    }
+
+    res.redirect('/admin/coupon');
+  } catch (error) {
+    console.log('Error happened in the coupon controller in the function editCoupon', error);
+    // Handle error, e.g., display an error message to the user
+    res.status(400).send(error.message);
+  }
+});
+
 
   //--------------------------------------------------------------
 
@@ -201,6 +213,7 @@ const updateCoupon = asyncHandler(async (req, res) => {
 //-------------chekthe coupon is valid or not -----------------
   const validateCoupon = asyncHandler(async (req, res) => {
     try {
+      console.log('entereeeeeeeeeeee');
       const name = req.body.couponCode;
   
       // Query the database to find the coupon by its name

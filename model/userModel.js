@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema({
    
    
       }],
+
+
+      referal: {
+         type: String
+      }
       
 
 })

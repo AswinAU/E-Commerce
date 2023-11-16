@@ -8,7 +8,8 @@
 					<th>Unit Price</th>
 					<th>Quantity</th>
 					<th>Total</th>
-					
+					<%var total=0%>
+					<%=order[0].discount%>
 					<% for(i=0;i<order.length;i++){%>
 					<tr>
 						
@@ -16,26 +17,20 @@
 						<th width="20%"><span class=" rounded-pill alert-success text-success"><%=order[i].paymentMode%></span></th>
 						<th width="20%">₹<%=order[i].items.price%></th>
 						<th width="20%"><%=order[i].quantity%></th>
-						<th width="20%" class="text-end"> ₹ <%=order[i].items.price * order[i].quantity%></th>
+						<%var x=order[i].items.price * order[i].quantity%>
+						<%total+=x%>
+						<th width="20%" class="text-end"> ₹ <%=x%></th>
+						
 					</tr>
 					
 				
 					<tr>
 						<td colspan="4">
 							<article class="float-end">
-								<!-- <dl class="dlist">
-									<dt>Discount:</dt>
-									<dd> ₹ <%=order[0].discount%></dd>
-								</dl> -->
-								<!-- <dl class="dlist">
-									<dt>Shipping cost:</dt>
-									<dd><%=order[0].orderStatus%></dd>
-								</dl> -->
-								<dl class="dlist">
-									<dt>Grand total:</dt>
-									<dd> <b class="h5">  ₹ <%=order[i].finalAmount%></b> </dd>
-								</dl>
+								
 								<%}%>
+								<%total=total-order[0].discount%>
+								<dd> <b class="h5">  ₹ <%=total%></b> </dd>
 								<dl class="dlist">
 									<dt class="text-muted">Status:</dt>
 									
@@ -44,11 +39,13 @@
 									</dd>
 									
 								</dl>
-								<div>
-									<form action="/invoice?id=<%=order[0]._id%>" method="post">
-										<button class="btn btn-md rounded font-sm" >Invoice</button>
-									</form>
-							</div>
+								<% if (order[0].orderStatus === 'Delivered') { %>
+									<div>
+										<form action="/invoice?id=<%= order[0]._id %>" method="post">
+											<button class="btn btn-md rounded font-sm">Invoice</button>
+										</form>
+									</div>
+								<% } %>
 								<!-- <div> <a href="" class="btn btn-md rounded font-sm">Invoice</a></div> -->
 							</article>
 						</td>

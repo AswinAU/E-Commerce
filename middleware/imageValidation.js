@@ -19,8 +19,8 @@ const imagevalidation = (req, res, next)=> {
 
   // Check image dimensions (for example, limit width and height)
   const dimensions = sizeOf(file.path);
-  const maxWidth = 800;
-  const maxHeight = 600;
+  const maxWidth = 1000;
+  const maxHeight = 1000;
   if (dimensions.width > maxWidth || dimensions.height > maxHeight) {
     return res.status(400).json({ error: `Image dimensions should not exceed ${maxWidth}x${maxHeight} pixels.` });
   }

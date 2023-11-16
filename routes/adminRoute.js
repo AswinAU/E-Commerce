@@ -106,5 +106,12 @@ admin_route.get("/deleteCoupon", auth.isLogin, couponController.deleteCoupon);
 admin_route.get("/editCoupon", auth.isLogin, couponController.editCoupon);
 admin_route.post("/updateCoupon", auth.isLogin, couponController.updateCoupon);
 
+admin_route.get("/monthly-report", auth.isLogin,adminController.monthlyreport)
+admin_route.get("/salesReport", auth.isLogin, adminController.SalesReoprt);
+admin_route.get("/salesToday", auth.isLogin,adminController.salesToday)
+admin_route.get("/salesWeekly", auth.isLogin,adminController.salesWeekly)
+admin_route.get("/salesMonthly",auth.isLogin, adminController.salesMonthly)
+admin_route.get("/salesYearly", auth.isLogin,adminController.salesYearly)
+
 admin_route.use(errorHandler);
 module.exports = admin_route;

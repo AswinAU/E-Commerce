@@ -55,6 +55,7 @@ user_route.get("/cart", auth.isLogin,auth.checkBlocked, cartController.getCartPa
 user_route.post("/addCart", auth.isLogin, cartController.addToCart)
 user_route.post("/removeFromCart", cartController.deleteCart)
 user_route.post("/change-quantity", cartController.changeQuantity)
+user_route.post("/change-quantity2", cartController.changeQuantity2)
 user_route.get("/whishList", auth.isLogin,auth.checkBlocked, cartController.getwhishlistPage);
 user_route.post("/addwhishlist", auth.isLogin, cartController.addTowhishlist)
 user_route.post("/removeFromwhishlist", cartController.deletewhishlist)
@@ -78,10 +79,10 @@ user_route.post("/confirmation", auth.isLogin, userController.confirmation)
 user_route.get("/orderlist", auth.isLogin,userController.ShowOrders)
 user_route.get("/orderDetail", auth.isLogin,userController.orderDetails)
 user_route.post("/change-order-status", userController.changeStatus)
-user_route.post("/invoice", userController.downloadInvoice)
 user_route.get("/orderSucceed",userController.orderSucceed)
 user_route.get("/orderFailure",userController.orderFailure)
 user_route.post("/validateCoupon",couponController.validateCoupon)
+user_route.post("/invoice", userController.downloadInvoice)
 
 user_route.use(errorHandler)
 module.exports=user_route;

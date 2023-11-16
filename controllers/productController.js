@@ -15,11 +15,13 @@ module.exports = {
       const endindex = startindex + itemsperpage;
       const totalpages = Math.ceil(data.length / 5);
       const currentproduct = data.slice(startindex, endindex);
+      const currentPage = '/admin/all-products';
       res.render("view-products", {
         products: currentproduct,
         data,
         currentpage,
         totalpages,
+        currentPage,
       });
     } catch (err) {
       next(err);
@@ -30,7 +32,8 @@ module.exports = {
   showAddProduct: async (req, res, next) => {
     try {
       const findCategory = await categoryModel.find({});
-      res.render("add-product", { data: findCategory });
+      const currentPage = '/admin/add-product';
+      res.render("add-product", { data: findCategory ,currentPage});
     } catch (err) {
       next(err);
     }
@@ -39,26 +42,62 @@ module.exports = {
   //function for adding-product
   addProduct: async (req, res, next) => {
     try {
-      let product = new productModel({
-        name: req.body.name,
-        description: req.body.description,
-        category: req.body.category,
-        regular_price: req.body.regular_price,
-        sale_price: req.body.sale_price,
-        created_on: Date.now(),
-        unit: req.body.units,
-        gst: req.body.gst,
-        quantity: req.body.quantity,
-        images: [
-          req.files[0]?.filename,
-          req.files[1]?.filename,
-          req.files[2]?.filename,
-          req.files[3]?.filename,
-        ],
-      });
-      await product.save().then((statsu) => {
-        res.redirect("/admin/all-products");
-      });
+      
+      const category = await categoryModel.findOne({ category: req.body.category });
+      const sale_price = req.body.sale_price;
+
+      //calculations on discount
+      //product-offer-price
+      const specialOffer = req.body.product_offer_price; 
+      const product_discount = (sale_price * specialOffer) / 100;
+      const product_offer_price = sale_price - product_discount;
+      
+      //category-offer-price
+      const category_offer_price = category.category_offer_price;
+      const category_discount = (sale_price * category_offer_price) / 100;
+      const category_discount_price = sale_price - category_discount;
+      
+      if(specialOffer > category_offer_price){
+        let product = new productModel({
+          name: req.body.name,
+          description: req.body.description,
+          category: req.body.category,
+          regular_price: req.body.regular_price,
+          sale_price:product_offer_price,
+          product_offer_price:req.body.product_offer_price,
+          created_on: Date.now(),
+          quantity: req.body.quantity,
+          images: [
+            req.files[0]?.filename,
+            req.files[1]?.filename,
+            req.files[2]?.filename,
+            req.files[3]?.filename,
+          ],
+        });
+        await product.save().then((statsu) => {
+          res.redirect("/admin/all-products");
+        });
+      }else{
+        let product = new productModel({
+          name: req.body.name,
+          description: req.body.description,
+          category: req.body.category,
+          regular_price: req.body.regular_price,
+          sale_price:category_discount_price,
+          product_offer_price:req.body.product_offer_price,
+          created_on: Date.now(),
+          quantity: req.body.quantity,
+          images: [
+            req.files[0]?.filename,
+            req.files[1]?.filename,
+            req.files[2]?.filename,
+            req.files[3]?.filename,
+          ],
+        });
+        await product.save().then((statsu) => {
+          res.redirect("/admin/all-products");
+        });
+      }
     } catch (err) {
       next(err);
     }
@@ -68,8 +107,10 @@ module.exports = {
   editProductPage: async (req, res, next) => {
     try {
       const productId = req.params.id;
+      const findCategory = await categoryModel.find({});
+      const currentPage = '/admin/edit';
       productModel.find({ _id: productId }).then((data) => {
-        res.render("edit-product", { data: data });
+        res.render("edit-product", { data: data ,  Data: findCategory , currentPage });
       });
     } catch (err) {
       next(err);
@@ -78,61 +119,97 @@ module.exports = {
 
   //to edit product-details
   editProduct: async (req, res, next) => {
+    console.log('entered--edit-product');
     try {
-      const id = req.params.id;
+      //console.log(req._id.toString(),'ididididid');
+      console.log('entered--edit-product----try');
+      //console.log(req.params.id,'req.params.id');
+      console.log(req,'reqqqq');
+      //console.log(req._id.toString(),'---------log---');
+      let id = req._id||req.params.id;
+      id = id.toString()
+      console.log(id,'--------id-------');
       const {
         name,
         description,
         regular_price,
         sale_price,
         quantity,
-        gst,
-        category,
-      } = req.body;
-      const size = req.body.size; // Assuming size is passed in the request body
+        //category,
+      } = req.body||req;
+      console.log('entered--edit-product---req');
+      const specialOffer = req.product_offer_price||req.body.product_offer_price;
+      console.log(specialOffer,'specialOffer');
+      const discount = (sale_price * specialOffer) / 100;
+      const product_offer_price = sale_price - discount;
 
-      if (req.files && req.files.length > 0) {
-        // If new images are uploaded, update the product with new images
-        const images = req.files.map((file) => file.filename);
+      const category = await categoryModel.findOne({ category: req.category||req.body.category });
+      const categori = category.category;
+      console.log(category,'categorycategory');
+      const category_offer_price = category.category_offer_price;
+      console.log(category_offer_price,'category_offer_price');
+  
+      //category-offer-price
+      // const category_offer_price = category.category_offer_price;
+      const category_discount = (sale_price * category_offer_price) / 100;
+      const category_discount_price = sale_price - category_discount;
 
-        await productModel.findByIdAndUpdate(
-          id,
-          {
-            name,
-            description,
-            regular_price,
-            sale_price,
-            quantity,
-            gst,
-            size,
-            category,
-            images,
-          },
-          { new: true }
-        );
-      } else {
-        // If no new images are uploaded, update the product without changing the images
-        await productModel.findByIdAndUpdate(
-          id,
-          {
-            name,
-            description,
-            regular_price,
-            sale_price,
-            quantity,
-            gst,
-            size,
-            category,
-          },
-          { new: true }
-        );
+      if(specialOffer > category_offer_price){
+        let updateData = {
+          name,
+          description,
+          regular_price,
+          sale_price: product_offer_price,
+          product_offer_price:specialOffer,
+          quantity,
+          category:categori,
+        };
+        console.log('entering to images');
+        if (req.files && req.files.length > 0) {
+          // If new images are uploaded, update the product with new images
+          updateData.images = req.files.map((file) => file.filename);
+        }
+        console.log('doneeeee');
+        await productModel.findByIdAndUpdate(id, updateData, { new: true });
+        console.log('updateddd');
+        if(req.body){
+          res.redirect("/admin/all-products");
+        }else{
+          
+        }
+      }else{
+        let updateData = {
+          name,
+          description,
+          regular_price,
+          sale_price: category_discount_price,
+          product_offer_price:specialOffer,
+          quantity,
+          category:categori,
+        };
+        console.log('entering to images2222222');
+        if (req.files && req.files.length > 0) {
+          // If new images are uploaded, update the product with new images
+          updateData.images = req.files.map((file) => file.filename);
+        }
+        console.log('donee2222');
+        await productModel.findByIdAndUpdate(id, updateData, { new: true });
+        console.log('updatedddd2');
+        if(req.body){
+          res.redirect("/admin/all-products");
+        }else{
+          
+        }
+        
       }
 
-      res.redirect("/admin/all-products");
+      
     } catch (err) {
+      console.log('entered pani paaali');
       next(err);
     }
   },
+  
 
   // render productDetails
   productDetails: async (req, res, next) => {

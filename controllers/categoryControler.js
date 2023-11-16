@@ -2,6 +2,8 @@ const { Rembg } = require("rembg-node");
 const rembg = new Rembg();
 //const sharp = require('sharp');
 const categoryModel = require("../model/category-model");
+const productModel = require("../model/product-model");
+const productController = require("../controllers/productController");
 
 module.exports = {
   //categories page
@@ -29,7 +31,7 @@ module.exports = {
       };
       const totalProducts = await categoryModel.countDocuments({});
       const totalPages = Math.ceil(totalProducts / itemsPerPage);
-
+      
       const data = await categoryModel
         .find({})
         .skip((currentPage - 1) * itemsPerPage)
@@ -57,8 +59,8 @@ module.exports = {
       if (!existingCategory) {
         const category = new categoryModel({
           category: cat.category,
-          base_price: cat.basePrice,
-          description: cat.description,
+          category_offer_price: cat.category_offer_price,
+          // description: cat.description,
           image: req.file.filename,
         });
 
@@ -108,7 +110,7 @@ module.exports = {
 
       // Update the category fields as needed
       existingCategory.category = updatedCategoryData.category;
-      existingCategory.base_price = updatedCategoryData.basePrice;
+      existingCategory.category_offer_price = updatedCategoryData.category_offer_price;
       existingCategory.description = updatedCategoryData.description;
 
       // Check if an image file is uploaded
@@ -120,6 +122,18 @@ module.exports = {
       // }
 
       await existingCategory.save();
+
+      const products = await productModel.find({ category: existingCategory.category });
+      console.log(products, 'products');
+
+      for (const product of products) {
+        const productId = product._id;
+        const data = await productModel.findById(productId);
+
+        // Assuming productController.editProduct accepts both productId and data
+        await productController.editProduct(data);
+      }
+
       res.redirect("/admin/categories");
     } catch (err) {
       req.session.categoryError = true;

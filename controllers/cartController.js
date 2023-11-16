@@ -8,6 +8,25 @@ module.exports = {
   //function to change number of products to be purchased
   changeQuantity: async (req, res, next) => {
     try {
+
+      //const finalAmount = req.body.total;
+    console.log(req.body,'finalAmountfinalAmount');
+
+    // Fetch the user document
+    // const userDoc = await user.findOne({ _id: req.session.user });
+
+    // // Update each element in the cart array with the finalAmount
+    // const updatedCart = userDoc.cart.map((cartItem) => {
+    //   return { ...cartItem, finalAmount };
+    // });
+    // console.log(updatedCart,'updatedCartupdatedCart');
+
+    // // Update the user document with the modified cart
+    // await user.updateOne(
+    //   { _id: req.session.user },
+    //   { $set: { cart: updatedCart } }
+    // );
+
       req.body.count = parseInt(req.body.count);
       req.body.quantity = parseInt(req.body.quantity);
 
@@ -102,59 +121,45 @@ module.exports = {
   //add product to cart
   addToCart: async (req, res, next) => {
     try {
-      let id = req.session.user;
+        let id = req.session.user;
+        let productId = req.query.id;
+        let quantity = parseInt(req.body.quantity);
+        let newPrice = parseInt(req.body.sale_price);
+        let size = req.body.size;
 
-      let productId = req.query.id;
+        const userData = await User.findById({ _id: id });
 
-      const userData = await User.findById({ _id: id }).lean();
+        if (!userData) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
 
-      if (userData.cart) {
-        const cartIndex = userData.cart.findIndex(
-          (item) => item.productId === productId
-        );
+        // Check if the product is already in the cart
+        const cartIndex = userData.cart.findIndex(item => item.productId === productId);
 
         if (cartIndex !== -1) {
-          // const productInCart = userData.cart[cartIndex];
-          // const newQuantity =
-          //   parseInt(productInCart.quantity) + parseInt(req.body.quantity);
-          // const newPrice = parseInt(productInCart.price) + parseInt(req.body.sale_price);
-          // await User.updateOne(
-          //   { _id: id, "cart.productId": productId },
-          //   {
-          //     $set: {
-          //       "cart.$.quantity": newQuantity,
-          //       "cart.$.sale_price": newPrice,
-          //       "cart.$.size": req.body.size,
-          //     },
-          //   }
-          // );
-          // res.redirect(`/product-details?id=${productId}`);
-          // res.redirect('/product-display')
-        } else {
-          console.log("Product not found in cart.");
-          let quantity = parseInt(req.body.quantity);
-          let newPrice = parseInt(req.body.sale_price);
-          User.findByIdAndUpdate(id, {
-            $push: {
-              cart: {
-                productId: productId,
-                quantity: quantity,
-                newPrice: newPrice,
-                size: req.body.size,
-              },
-            },
-          }).then((data) => {
-            res.redirect(`/product-details?id=${productId}`);
-            // res.redirect('/product-display')
-          });
+            return res.status(200).json({ success: false, message: "Product already in cart." });
         }
-      } else {
-        res.send("😒");
-      }
+
+        // Product is not in the cart, add it
+        await User.findByIdAndUpdate(id, {
+            $push: {
+                cart: {
+                    productId: productId,
+                    quantity: quantity,
+                    newPrice: newPrice,
+                    size: size
+                }
+            }
+        });
+
+        res.status(200).json({ success: true, message: "Product added to cart." });
+
     } catch (err) {
-      next(err);
+        console.error(err);
+        res.status(500).json({ success: false, message: "Failed to add product to cart." });
     }
-  },
+},
+
 
   //to delete from cart
   deleteCart: async (req, res) => {
@@ -196,55 +201,39 @@ module.exports = {
   //to add to whishlist
   addTowhishlist: async (req, res, next) => {
     try {
-      let id = req.session.user;
+        let id = req.session.user;
+        let productId = req.query.id;
+        const userData = await User.findById({ _id: id }).lean();
 
-      let productId = req.query.id;
-
-      const userData = await User.findById({ _id: id }).lean();
-
-      if (userData.whishlist) {
-        const whishlistIndex = userData.whishlist.findIndex(
-          (item) => item.productId === productId
+        // Check if the product is already in the wishlist
+        const isProductInWishlist = userData.whishlist.some(
+            (item) => item.productId === productId
         );
 
-        if (whishlistIndex !== -1) {
-          const productInwhishlist = userData.whishlist[whishlistIndex];
-          const newQuantity =
-            parseInt(productInwhishlist.quantity) + parseInt(req.body.quantity);
-
-          await User.updateOne(
-            { _id: id, "whishlist.productId": productId },
-            {
-              $set: {
-                "whishlist.$.quantity": newQuantity,
-                "whishlist.$.size": req.body.size,
-              },
-            }
-          );
-          res.redirect(`/product-details?id=${productId}`);
-          // res.redirect('/product-display')
+        if (isProductInWishlist) {
+            // Product is already in the wishlist
+            res.json({ success: false, message: "Product is already in the wishlist." });
         } else {
-          let quantity = parseInt(req.body.quantity);
-          User.findByIdAndUpdate(id, {
-            $push: {
-              whishlist: {
-                productId: productId,
-                quantity: quantity,
-                size: req.body.size,
-              },
-            },
-          }).then((data) => {
-            res.redirect(`/product-details?id=${productId}`);
-            // res.redirect('/product-display')
-          });
+            // Product is not in the wishlist, add it
+            let quantity = parseInt(req.body.quantity);
+            await User.findByIdAndUpdate(id, {
+                $push: {
+                    whishlist: {
+                        productId: productId,
+                        quantity: quantity,
+                        size: req.body.size,
+                    },
+                },
+            });
+            res.json({ success: true, message: "Product added to wishlist." });
         }
-      } else {
-        res.send("😒");
-      }
     } catch (err) {
-      next(err);
+        console.error(err);
+        res.status(500).json({ success: false, message: "Failed to add product to wishlist." });
     }
-  },
+},
+
+
 
   //to render whishlist page
   getwhishlistPage: async (req, res, next) => {
@@ -323,4 +312,31 @@ module.exports = {
       next(err);
     }
   },
+
+  changeQuantity2: async (req, res, next) => {
+    try {
+
+    const finalAmount = req.body.finalAmount;
+    console.log(req.body,'finalAmountfinalAmount');
+
+    // Fetch the user document
+    const userDoc = await User.findOne({ _id: req.session.user });
+
+    // Update each element in the cart array with the finalAmount
+    const updatedCart = userDoc.cart.map((cartItem) => {
+      return { ...cartItem, finalAmount };
+    });
+    console.log(updatedCart,'updatedCartupdatedCart');
+
+    // Update the user document with the modified cart
+    await User.updateOne(
+      { _id: req.session.user },
+      { $set: { cart: updatedCart } }
+    );
+
+    } catch (err) {
+      next(err);
+    }
+  },
+
 };
