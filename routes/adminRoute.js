@@ -113,5 +113,6 @@ admin_route.get("/salesWeekly", auth.isLogin,adminController.salesWeekly)
 admin_route.get("/salesMonthly",auth.isLogin, adminController.salesMonthly)
 admin_route.get("/salesYearly", auth.isLogin,adminController.salesYearly)
 
+admin_route.post('/deletedproduct',auth.isLogin,productController.deleteProductImage)
 admin_route.use(errorHandler);
 module.exports = admin_route;

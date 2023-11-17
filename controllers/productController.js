@@ -235,4 +235,23 @@ module.exports = {
         next(err);
       });
   },
+
+   deleteProductImage : async(req , res , next) => {
+    try { 
+      const {productId ,index} = req.body
+      const findProduct = await productModel.findOne({ _id: productId })
+      console.log(findProduct,'findProductfindProduct');
+      if (!findProduct) {
+          res.status(404).send('Product not found');
+      } else {
+          findProduct.images.splice(index, 1)
+          findProduct.save()
+
+          res.status(200).json({ message: 'Product image deleted successfully', product: findProduct });
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
 };

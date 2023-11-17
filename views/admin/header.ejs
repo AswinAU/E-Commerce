@@ -37,8 +37,8 @@
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu <%= (currentPage === '/admin/add-product' || currentPage === '/admin/all-products' || currentPage === '/admin/category' || currentPage === '/admin/edit') ? 'active' : '' %>">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                <li class="menu-item has-submenu <%= (currentPage === '/admin/add-product' || currentPage === '/admin/all-products' || currentPage === '/admin/category' || currentPage === '/admin/add-category' || currentPage === '/admin/edit') ? 'active' : '' %>">
+                    <a class="menu-link" href="/admin/add-product"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                     <div class="submenu">
@@ -48,7 +48,7 @@
                     </div>
                 </li>
                 <li class="menu-item has-submenu  <%= (currentPage === '/admin/add-Coupon' || currentPage === '/admin/coupon'  )? 'active' : '' %>">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="/admin/add-Coupon"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Coupens</span>
                     </a>
                     <div class="submenu">
@@ -58,7 +58,7 @@
                     </div>
                 </li>
                 <li class="menu-item has-submenu  <%= (currentPage === '/admin/order-list')? 'active' : '' %>">
-                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_cart"></i>
+                    <a class="menu-link" href="/admin/order-list"> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Orders</span>
                     </a>
                     <div class="submenu">
@@ -66,7 +66,7 @@
                     </div>
                 </li>
                 <li class="menu-item has-submenu  <%= (currentPage === '/admin/userslist')? 'active' : '' %>">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                    <a class="menu-link" href="/admin/userslist"> <i class="icon material-icons md-store"></i>
                         <span class="text">Users</span>
                     </a>
                     <div class="submenu">
@@ -77,7 +77,7 @@
                 </li>
                 
                 <li class="menu-item has-submenu  <%= (currentPage === '/admin/salesToday'|| currentPage === '/admin/salesWeekly' || currentPage === '/admin/salesMonthly' || currentPage === '/admin/salesYearly')? 'active' : '' %>">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
+                    <a class="menu-link" href="/admin/salesReport"> <i class="icon material-icons md-person"></i>
                         <span class="text">Transactions</span>
                     </a>
                     <div class="submenu">

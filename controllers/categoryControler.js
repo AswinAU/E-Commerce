@@ -10,7 +10,8 @@ module.exports = {
   categories: async (req, res, next) => {
     try {
       categoryModel.find({}).then((data) => {
-        res.render("page-categories", { data });
+        currentPage = '/admin/category'
+        res.render("page-categories", { data , currentPage });
       });
     } catch (err) {
       next(err);
@@ -90,7 +91,8 @@ module.exports = {
       const categoryId = req.params.id;
 
       categoryModel.find({ _id: categoryId }).then((data) => {
-        res.render("edit-category", { data: data });
+        currentPage = '/admin/category'
+        res.render("edit-category", { data: data , currentPage});
       });
     } catch (err) {
       next(err);
