@@ -64,7 +64,10 @@
                                         <div class="clearfix product-price-cover">
                                             <div class="product-price primary-color float-left">
                                                 <span class="text-brand">Old Price ₹ <%=data.regular_price%></span><br>
-                                                <ins><span class="text-brand">Sales Price ₹ <%=data.sale_price%></span></ins>
+                                                <ins><span class="text-brand">Sales Price ₹ <%=data.sale_price%></span></ins><br><br>
+                                                <% if (data.quantity < 1) { %>
+                                                    <span ><h4 style="color: red;">Out of Stock</h4></span>
+                                                <% } %> 
                                                
                                             </div>
                                         </div>
@@ -104,7 +107,12 @@
                                                 </div>
                                             </div>
                                             <div class="product-extra-link2">
-                                                <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                <% if (data.quantity < 1) { %>
+                                                    <span><h4 style="color: red;">Out of Stock</h4></span>
+                                                <% } else { %>
+                                                    <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                <% } %>
+                                                
                                                 <div id="addToWishlistBtn" data-product-id="<%=data._id%>" class="custom-button" style="padding: 10px;">
                                                     <i class="fi-rs-heart"></i> 
                                                 </div>

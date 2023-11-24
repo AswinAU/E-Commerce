@@ -310,12 +310,15 @@
         </script>
 
         <!------------------------- coupons --------------------------------->
+
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.min.js"></script> -->
 <script>
     var coupon=0
 
 
     function applyCoupon() {
-      swal({
+       swal({
         text: 'Apply your coupon code here !!!',
         content: 'input',
         button: {
@@ -409,13 +412,13 @@
 
         <script>
             function makePurchase(GrandTotal) {
-                alert('hai')
+                
                 var x = document.getElementById('discountAmount').innerText
                 var total = GrandTotal - x
                 // alert(total,'totaltotal')
                 let addressId = $("#addressselect:checked").val();
                 if (!addressId) {
-                    Swal.fire({
+                    swal({
                         title: "select address",
                         text: "",
                         icon: "error",
@@ -450,6 +453,15 @@
 
                         },
                         success: (response) => {
+                            if(response.stockerr){
+                                swal({
+                                    title: 'Out of stock',
+                                    text: "Can't process order error occured",
+                                    icon: 'error',
+                                    timer: 5000
+                                })
+                                return;
+                            }
                             // console.log(response.status)
                             if (response.method === 'cod') {
                                 // If the payment method is 'cod', redirect to a new page
@@ -488,7 +500,7 @@
 
                             }
                             else {
-                                Swal.fire({
+                                swal({
                                     title: 'Error Occured',
                                     text: "Can't process order error occured",
                                     icon: 'fail',
@@ -562,7 +574,7 @@
 
 
    function hai(total){
-    alert(total)
+    
     }
 </script>
 

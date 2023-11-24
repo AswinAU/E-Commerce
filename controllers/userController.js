@@ -26,11 +26,11 @@ const loadHome = async (req, res, next) => {
 //load register
 const loadRegister = async (req, res, next) => {
   try {
-    // if (req.query.id) {
-    //   req.session.referel = req.query.id;
-    //   console.log(req.session.referel, "sessionnnnn");
-    // }
-    
+    if (req.query.id) {
+      req.session.referel = req.query.id;
+      console.log(req.session.referel, "sessionnnnn");
+    }
+
     res.render("registration", { message: false });
   } catch (err) {
     next(err);
@@ -47,7 +47,7 @@ const otppage = async (req, res) => {
   }
 };
 
-//user insertion 
+//user insertion
 const insertUser = async (req, res, next) => {
   try {
     const { name, email, password, repeatPassword, otp } = req.body;
@@ -93,7 +93,7 @@ const insertUser = async (req, res, next) => {
       repeatPassword: spassword,
       is_admin: 0,
     });
-    
+
     // Save the user to the database
     const userData = await newUser.save();
     //generate otp and send verification mail
@@ -106,7 +106,6 @@ const insertUser = async (req, res, next) => {
     } else {
       res.render("registration", { message: "your registerarion Failed" });
     }
-
   } catch (err) {
     // Handle errors
     next(err);
@@ -195,7 +194,7 @@ const validateOtp = async (req, res) => {
         { $set: { is_verified: 1 } }
       );
 
-      res.redirect("/login");
+      res.render("login",{message: false});
     }
   } catch (error) {
     console.log(error.message);
@@ -237,52 +236,53 @@ const verifyLogin = async (req, res, next) => {
     if (userData) {
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
-      // req.session.user = userData;
-      // console.log(req.session.user);
-      // if (req.session.referel) {
-      //   const refererId = req.session.referel;
-      //   const userId = req.session.user;
-      //   const walletUpdateAmount = 200;
-      //   const historyUpdateAmount = 200;
+      req.session.user = userData;
+      console.log(req.session.user);
+      if (req.session.referel) {
+        console.log(req.session.referel,'req.session.referel');
+        const refererId = req.session.referel;
+        const userId = req.session.user;
+        const walletUpdateAmount = 200;
+        const historyUpdateAmount = 200;
 
-      //   // Update the referer's wallet and push a new history record
-      //   await userModel.findByIdAndUpdate(
-      //     refererId,
-      //     {
-      //       $push: {
-      //         wallet: {
-      //           amount: walletUpdateAmount,
-      //           paymentType: "C",
-      //           timestamp: Date.now(),
-      //         },
-      //         history: {
-      //           amount: historyUpdateAmount,
-      //           paymentType: "Credit",
-      //           timestamp: Date.now(),
-      //         },
-      //       },
-      //     },
-      //     { new: true }
-      //   );
-      //   await userModel.findByIdAndUpdate(
-      //     req.session.user,
-      //     {
-      //       $push: {
-      //         wallet: {
-      //           amount: walletUpdateAmount,
-      //           paymentType: "C",
-      //           timestamp: Date.now(),
-      //         },
-      //         history: {
-      //           amount: historyUpdateAmount,
-      //           paymentType: "Credit",
-      //           timestamp: Date.now(),
-      //         },
-      //       },
-      //     },
-      //     { new: true }
-      //   );
-      // }
+        // Update the referer's wallet and push a new history record
+        await userModel.findByIdAndUpdate(
+          refererId,
+          {
+            $push: {
+              wallet: {
+                amount: walletUpdateAmount,
+                paymentType: "C",
+                timestamp: Date.now(),
+              },
+              history: {
+                amount: historyUpdateAmount,
+                paymentType: "Credit",
+                timestamp: Date.now(),
+              },
+            },
+          },
+          { new: true }
+        );
+        await userModel.findByIdAndUpdate(
+          req.session.user,
+          {
+            $push: {
+              wallet: {
+                amount: walletUpdateAmount,
+                paymentType: "C",
+                timestamp: Date.now(),
+              },
+              history: {
+                amount: historyUpdateAmount,
+                paymentType: "Credit",
+                timestamp: Date.now(),
+              },
+            },
+          },
+          { new: true }
+        );
+      }
 
       if (passwordMatch) {
         req.session.user = userData._id;
@@ -453,6 +453,200 @@ const removeAddres = async (req, res, next) => {
   res.json({ status: true });
 };
 
+// editProfile
+const editProfile = async (req, res, next) => {
+  console.log("entererered");
+  let userdata = await req.session.user;
+
+  // const data = req.params.userId;
+  // const profile = await user.findById(id);
+  user.findById(userdata).then((data) => {
+    res.render("edit-userProfile", {
+      data,
+      userdata,
+      log: req.session.isLoggedIn,
+    });
+  });
+};
+
+// editProFile
+const editProFile = async (req, res, next) => {
+  console.log("/EditproFile");
+  let userdata = await req.session.user;
+
+  // const data = req.params.userId;
+  // const profile = await user.findById(id);
+  user.findById(userdata).then((data) => {
+    res.render("edit-proFile", { data, userdata, log: req.session.isLoggedIn });
+  });
+};
+
+// updateUserProfile
+const updateUserProfile = async (req, res, next) => {
+  try {
+    const { name, email, mobile } = req.body;
+    console.log(req.session,'session');
+    console.log(req.body,'req.body');
+      const updateUser = await user.findOneAndUpdate(
+        { _id: req.session.user },
+        { $set: { name: name, email: email, mobile: mobile } }
+      );
+      console.log(updateUser,'updateUser');
+    res.redirect("/edit-profile");
+  } catch (err) {
+    next(err)
+  }
+};
+
+//
+const foregetPassword = async (req, res) => {
+  try {
+    res.render("forget-password", { message: false });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//
+const ForegetverifyPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const userData = await user.findOne({ email: email });
+    if (userData) {
+      if (userData.is_verified === 0) {
+        res.render("forget-password", { message: "please verify Your mail" });
+      } else {
+        const randomstring = randomString.generate();
+        const updateUser = await user.updateOne(
+          { email: email },
+          { $set: { token: randomstring } }
+        );
+        sendresetpasswordMail(userData.name, userData.email, randomstring);
+        res.render("forget-password", {
+          message: "plesase check your mail to reset a password",
+        });
+      }
+    } else {
+      res.render("forget-password", { message: "Email is incorrect" });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+//sendresetpasswordMail
+const sendresetpasswordMail = async (name, email, token) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: config.emailUser,
+        pass: config.emailPassword,
+      },
+    });
+    const mailOption = {
+      from: "aswinbrototype@gmail.com",
+      to: email,
+      subject: "For Reset password",
+      html:
+        "<p>Hyy " +
+        name +
+        ', please click here to <a href="http://127.0.0.1:4000/forgot-password?token=' +
+        token +
+        ' "> Reset </a> your password</p>',
+    };
+    console.log(mailOption, "mailOption");
+    transporter.sendMail(mailOption, function (error, info) {
+      if (error) {
+      } else {
+        console.log("Email has been send :-", info.response);
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//changePassword
+const changePassword = async (req, res) => {
+  try {
+    const token = req.query.token;
+    const tokenData = await user.findOne({ token: token });
+    if (tokenData) {
+      res.render("reset-Password", { user_id: tokenData.id, message: false });
+    } else {
+      res.render("users/404", { message: "token is invalid" });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+//resetpassword
+const resetpassword = async (req, res) => {
+  try {
+    const password = req.body.password;
+
+    const secure_password = await securePassword(password);
+
+    const updateData = await user.findOneAndUpdate(
+      { _id: req.body.user_id },
+      { $set: { password: secure_password, token: "" } }
+    );
+    res.redirect("/");
+  } catch (err) {
+    next(err);
+  }
+};
+
+//
+const ChangePassword = async (req, res) => {
+  try {
+    console.log('entered');
+    let message;
+
+        if (req?.query?.message) {
+            message = req?.query?.message
+        }
+        console.log(message,'message');
+      res.render("change-Password", { message })
+  }
+  catch (err){
+    next(err)
+  }
+}
+
+//
+const newPassword = async (req, res) => {
+  try {
+    console.log(req.body,'kkkkkkkkkkk');
+      const { password, newpassword, repeatPassword } = req.body
+      console.log(req.body,'req.body');
+      console.log(req.session,'req.session');
+      const userData = await user.findOne({ _id: req.session.user })
+      const checkpassword = await bcrypt.compare(password, userData.password)
+
+      if (checkpassword) {
+          const Spassword = await securePassword(newpassword)
+          console.log("secure", Spassword)
+          const updatePassword = await user.updateOne({ _id: req.session.user_id }, { $set: { password: Spassword } })
+          console.log("updated", updatePassword);
+          res.json({ success: true, message: 'Password updated successfully' });
+          // res.redirect("/changepassword")
+      } else {
+          res.redirect("/changepassword?message=Incorrect password")
+      }
+  }
+  catch (error) {
+      console.log(error.message);
+      res.render('users/404', { user: req.session.user_id })
+  }
+}
+
+
 //products
 const products = async (req, res, next) => {
   try {
@@ -464,7 +658,7 @@ const products = async (req, res, next) => {
   }
 };
 
-// load checkout 
+// load checkout
 const checkout = async (req, res, next) => {
   try {
     const coupon = await coupounModel.find({
@@ -477,8 +671,7 @@ const checkout = async (req, res, next) => {
         coupon,
         log: req.session.isLoggedIn,
       });
-      console.log(data[0].cart[0],'datadatadatadata');
-      
+      console.log(data[0].cart[0], "datadatadatadata");
     });
   } catch (err) {
     next(err);
@@ -488,7 +681,7 @@ const checkout = async (req, res, next) => {
 // confirmation of order
 const confirmation = async (req, res, next) => {
   try {
-    const discount=req.body.discount;
+    const discount = req.body.discount;
     const status = req.body.payment;
     const userData = await user.findById(req.session.user);
     const items = [];
@@ -502,13 +695,13 @@ const confirmation = async (req, res, next) => {
         if (product.quantity < 1) {
           canPlaceOrder = false; // Product quantity is below 1, cannot place the order
           console.error(`Product with ID ${product._id} has quantity below 1.`);
-          break; // Exit the loop when a product quantity is below 1
+          return res.json({stockerr:true})
         } else {
           const temp = {
             product: product._id,
             quantity: userData.cart[i].quantity,
             price: product.sale_price,
-            discount
+            discount,
           };
           items.push(temp);
 
@@ -534,28 +727,26 @@ const confirmation = async (req, res, next) => {
 
     // let total = req.body.GrandTotal
     // console.log(total,'totaltotal');
-    console.log(req.body,"BODY>>>>>>>>>>>>>>>>>>>>.");
+    console.log(req.body, "BODY>>>>>>>>>>>>>>>>>>>>.");
     const order = await orderModel.create({
       user: req.session.user,
       items,
-      orderStatus:"pending",
-      totalAmount: '0',
+      orderStatus: "pending",
+      totalAmount: "0",
       finalAmount: req.body.GrandTotal,
       paymentMode: status,
       address: userData.address[0],
-      discount
+      discount,
       //discount: req.body.GrandTotal,
     });
-    console.log(order,'orderCreated');
+    console.log(order, "orderCreated");
 
     if (order.paymentMode === "cod") {
       id = req.session.user;
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
-        .then((data) => {
-        })
-        .catch((err) => {
-        });
+        .then((data) => {})
+        .catch((err) => {});
 
       res.json({ payment: true, method: "cod", order: order });
     } else if (order.paymentMode === "online") {
@@ -574,10 +765,8 @@ const confirmation = async (req, res, next) => {
       id = req.session.user;
       await user
         .findByIdAndUpdate(id, { $set: { cart: [] } })
-        .then((data) => {
-        })
-        .catch((err) => {
-        });
+        .then((data) => {})
+        .catch((err) => {});
 
       await user
         .findByIdAndUpdate(id, {
@@ -601,7 +790,7 @@ const confirmation = async (req, res, next) => {
   }
 };
 
-//RazorPay 
+//RazorPay
 const Razorpay = require("razorpay");
 const { Transaction } = require("mongodb");
 const userModel = require("../model/userModel");
@@ -640,10 +829,8 @@ const verifyRazorpayPayment = (req, res, next) => {
         id = req.session.user;
         await user
           .findByIdAndUpdate(id, { $set: { cart: [] } })
-          .then((data) => {
-          })
-          .catch((err) => {
-          });
+          .then((data) => {})
+          .catch((err) => {});
 
         res.json({ status: true });
       })
@@ -791,8 +978,6 @@ const orderDetails = async (req, res, next) => {
 //   }
 // };
 
-
-
 const changeStatus = async (req, res, next) => {
   try {
     const orderId = req.body.orderId;
@@ -806,7 +991,10 @@ const changeStatus = async (req, res, next) => {
     }
 
     // Check if the order status is being changed to 'cancelled'
-    if (order.orderStatus !== ' Order cancelled' && newStatus === ' Order cancelled') {
+    if (
+      order.orderStatus !== " Order cancelled" &&
+      newStatus === " Order cancelled"
+    ) {
       // If the order is being cancelled, restore product quantities
       for (const item of order.items) {
         const product = await productModel.findById(item.product);
@@ -819,7 +1007,9 @@ const changeStatus = async (req, res, next) => {
     }
 
     // Update the order status in the database
-    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { orderStatus: newStatus });
+    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, {
+      orderStatus: newStatus,
+    });
 
     // Perform other logic here (addToWallet or any other operations)
     addToWallet(req, res, order.totalAmount, "c");
@@ -831,7 +1021,6 @@ const changeStatus = async (req, res, next) => {
     res.json(false);
   }
 };
-
 
 //add to wallet
 const addToWallet = async (req, res, amount, transactionType) => {
@@ -878,7 +1067,7 @@ const wallet = (req, res, next) => {
 //category
 const subCategory = async (req, res, next) => {
   const category = await catMOdel.find().lean();
-  
+
   await productModel
     .find({ category: req.query.cat })
     .lean()
@@ -939,7 +1128,7 @@ const priceFilter = async (req, res, next) => {
   }
 };
 
-//filter 
+//filter
 const filteredProducts = async (req, res, next) => {
   try {
     if (!req.session.isLoggedIn) {
@@ -987,7 +1176,6 @@ const filteredProducts = async (req, res, next) => {
 //search products by name
 const searchProd = async (req, res, next) => {
   try {
-    
     let data = await productModel.find({
       name: { $regex: `${req.body.search}`, $options: "i" },
     });
@@ -997,7 +1185,7 @@ const searchProd = async (req, res, next) => {
   }
 };
 
-//order success 
+//order success
 const orderSucceed = async (req, res, next) => {
   try {
     res.render("ordersucceed", { log: req.session.isLoggedIn });
@@ -1021,12 +1209,12 @@ const downloadInvoice = async (req, res, next) => {
     const id = req.query.id;
     const userId = req.session.user._id;
     const result = await orderModel.findById(id);
-    console.log(result,'result');
+    console.log(result, "result");
     //const product = await productModel.findById(result.items[0].product);
     //const product = result.items.map(item => item.product);
 
     const User = await user.findOne({ _id: userId });
-    
+
     const order = {
       _id: id,
       totalAmount: result.finalAmount,
@@ -1044,20 +1232,22 @@ const downloadInvoice = async (req, res, next) => {
       items: result.items,
     };
 
-    console.log(order,'orderorderorder');
-    
+    console.log(order, "orderorderorder");
+
     //set up the product
-    const products = await Promise.all(order.items.map(async (item) => {
-      const product = await productModel.findById(item.product);
-      return {
-        quantity: parseInt(item.quantity),
-        description: product.name,
-        price: parseInt(product.sale_price),
-        total: parseInt(item.price), // Assuming item.price is the total price for the current item
-        "tax-rate": 0,
-      };
-    }));
-    console.log(products,'productsproducts');
+    const products = await Promise.all(
+      order.items.map(async (item) => {
+        const product = await productModel.findById(item.product);
+        return {
+          quantity: parseInt(item.quantity),
+          description: product.name,
+          price: parseInt(product.sale_price),
+          total: parseInt(item.price), // Assuming item.price is the total price for the current item
+          "tax-rate": 0,
+        };
+      })
+    );
+    console.log(products, "productsproducts");
     const isoDateString = order.date;
     const isoDate = new Date(isoDateString);
 
@@ -1134,6 +1324,16 @@ module.exports = {
   editAddress,
   confirmEdit,
   removeAddres,
+  editProfile,
+  editProFile,
+  updateUserProfile,
+  foregetPassword,
+  ForegetverifyPassword,
+  sendresetpasswordMail,
+  changePassword,
+  resetpassword,
+  ChangePassword,
+  newPassword,
   confirmation,
   ShowOrders,
   orderDetails,

@@ -133,11 +133,18 @@ module.exports = {
             return res.status(404).json({ success: false, message: "User not found." });
         }
 
+        
+
         // Check if the product is already in the cart
         const cartIndex = userData.cart.findIndex(item => item.productId === productId);
 
         if (cartIndex !== -1) {
             return res.status(200).json({ success: false, message: "Product already in cart." });
+        }
+        let productquantity;
+        let product = await productModel.findOne({ _id: productId });
+        if(product){
+           productquantity = product.quantity;
         }
 
         // Product is not in the cart, add it
@@ -147,10 +154,11 @@ module.exports = {
                     productId: productId,
                     quantity: quantity,
                     newPrice: newPrice,
-                    size: size
+                    size: size,
+                    productquantity
                 }
             }
-        });
+        }); 
 
         res.status(200).json({ success: true, message: "Product added to cart." });
 

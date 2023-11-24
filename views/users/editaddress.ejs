@@ -1,122 +1,369 @@
-<%- include('../layouts/header.ejs') %>
+
+    <%- include('../layouts/header.ejs') %>
+
+  <style>
+    body {
+      color: #999;
+      background: #fafafa;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .form-control {
+      min-height: 41px;
+      box-shadow: none;
+      border-color: #e6e6e6;
+    }
+
+    .form-control:focus {
+      border-color: #00c1c0;
+    }
+
+    .form-control,
+    .btn {
+      border-radius: 3px;
+    }
+
+    .signup-form {
+      width: 425px;
+      margin: 0 auto;
+      padding: 30px 0;
+    }
+
+    .signup-form h2 {
+      color: #333;
+      font-weight: bold;
+      margin: 0 0 25px;
+    }
+
+    .signup-form form {
+      margin-bottom: 15px;
+      background: #fff;
+      border: 1px solid #f4f4f4;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+      padding: 40px 50px;
+    }
+
+    .signup-form .form-group {
+      margin-bottom: 20px;
+    }
+
+    .signup-form label {
+      font-weight: normal;
+      font-size: 14px;
+    }
+
+    .signup-form input[type="checkbox"] {
+      position: relative;
+      top: 1px;
+    }
+
+    .signup-form .btn,
+    .signup-form .btn:active {
+      font-size: 16px;
+      font-weight: bold;
+      background: #00c1c0 !important;
+      border: none;
+      min-width: 140px;
+    }
+
+    .signup-form .btn:hover,
+    .signup-form .btn:focus {
+      background: #00b3b3 !important;
+    }
+
+    .signup-form a {
+      color: #00c1c0;
+      text-decoration: none;
+    }
+
+    .signup-form a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="//cdn.tutorialjinni.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//cdn.tutorialjinni.com/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+  <link rel="stylesheet"
+    href="//g.tutorialjinni.com/mojoaxel/bootstrap-select-country/dist/css/bootstrap-select-country.min.css" />
+  <link rel="stylesheet" href="/public/newCss/style.css">
+
+  </head>
+
+  <body>
+    <section class="content-main">
+      <div class="row d-flex justify-content-center">
+        <div class="col-lg-8">
+          <style>
+            .error-message {
+              color: red;
+            }
+          </style>
+          <form method="post" action="/editAdress?id=<%=userAddress._id%>" class="colorlib-form" onsubmit="return validateForm()">
+            <h2>Add Address</h2>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input id="name" type="text" class="form-control" name="name" value="<%=userAddress.name%>" placeholder="Enter Your Name" required>
+                  <span id="nameError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="house">Address</label>
+                  <input id="house" type="text" class="form-control" name="house" value="<%=userAddress.house%>" placeholder="Enter Your Address"
+                    required>
+                  <span id="houseError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="area">Area</label>
+                  <input id="area" type="text" class="form-control" name="area" value="<%=userAddress.area%>"
+                    placeholder="Area, Street, Sector, Village" required>
+                  <span id="areaError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="landmark">Landmark</label>
+                  <input id="landmark" type="text" class="form-control" name="landmark" value="<%=userAddress.landmark%>" placeholder="Landmark" required>
+                  <span id="landmarkError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="town">Town/City</label>
+                  <input id="town" type="text" class="form-control" name="town" value="<%=userAddress.town%>" placeholder="Town/City" required>
+                  <span id="townError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="state">State/Province</label>
+                  <input id="state" type="text" class="form-control" name="state" value="<%=userAddress.state%>" placeholder="State" required>
+                  <span id="stateError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="pin-code">Postal Code</label>
+                  <input id="pin-code" type="number" class="form-control" name="pinCode" value="<%=userAddress.pinCode%>" placeholder="Postal Code"
+                    required>
+                  <span id="pin-codeError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input id="number" type="number" class="form-control" name="number" value="<%=userAddress.number%>" placeholder="Phone Number"
+                    required>
+                  <span id="numberError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phone">Alternative Number</label>
+                  <input type="number" id="altNumber" name="altNumber" value="<%=userAddress.altNumber %>" class="form-control"
+                    placeholder="Alternative Number" required>
+                  <span id="altNumberError" class="error-message"></span>
+                </div>
+              </div>
+              <div class="col-md-12 form-group">
+                <button type="submit" value="submit" class="btn btn-primary">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </section>
 
 
-    <style>
-        body {
-            color: #999;
-            background: #fafafa;
-            font-family: 'Roboto', sans-serif;
-        }
-        .form-control {
-            min-height: 41px;
-            box-shadow: none;
-            border-color: #e6e6e6;
-        }
-        .form-control:focus {
-            border-color: #00c1c0;
-        }
-        .form-control, .btn {        
-            border-radius: 3px;
-        }
-        .signup-form {
-            width: 425px;
-            margin: 0 auto;
-            padding: 30px 0;
-        }
-        .signup-form h2 {
-            color: #333;
-            font-weight: bold;
-            margin: 0 0 25px;
-        }
-        .signup-form form {
-            margin-bottom: 15px;
-            background: #fff;
-            border: 1px solid #f4f4f4;
-            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-            padding: 40px 50px;
-        }
-        .signup-form .form-group {
-            margin-bottom: 20px;
-        }
-        .signup-form label {
-            font-weight: normal;
-            font-size: 14px;
-        }
-        .signup-form input[type="checkbox"] {
-            position: relative;
-            top: 1px;
-        }    
-        .signup-form .btn, .signup-form .btn:active {        
-            font-size: 16px;
-            font-weight: bold;
-            background: #00c1c0 !important;
-            border: none;
-            min-width: 140px;
-        }
-        .signup-form .btn:hover, .signup-form .btn:focus {
-            background: #00b3b3 !important;
-        }
-        .signup-form a {
-            color: #00c1c0;
-            text-decoration: none;
-        }	
-        .signup-form a:hover {
-            text-decoration: underline;
-        }
-        </style>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    
-        <link rel="stylesheet" href="//cdn.tutorialjinni.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//cdn.tutorialjinni.com/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
-        <link rel="stylesheet" href="//g.tutorialjinni.com/mojoaxel/bootstrap-select-country/dist/css/bootstrap-select-country.min.css" />
-        
-    
-    </head>
-        <body>
-        <div class="signup-form">
-            <form action="/editAdress?id=<%=userAddress._id%>" method="post">
-                <h2>EDIT ADDRESS</h2>
-                
-                <div class="form-group">
-                    <input id="name" type="text" class="form-control" name="name" value="<%=userAddress.name%>" placeholder="Full Name" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="number"   type="text" class="form-control" name="number" value="<%=userAddress.number%>" placeholder="Mobile Number" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="altnumber"   type="text" class="form-control" name="altNumber" value="<%=userAddress.altNumber %>"  placeholder="Alternative Number" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="pin-code" type="text" class="form-control" name="pinCode"  value="<%=userAddress.pinCode%>" placeholder="Pin code" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="house"   type="text" class="form-control" name="house"  value="<%=userAddress.house%>"placeholder="Flat, House no., Building, Company, Apartment" required="required">
-                </div>
-                <div class="form-group">
-                    <input id="area"   type="text" class="form-control" name="area"  value="<%=userAddress.area%>"placeholder="Area, Street, Sector, Village" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="landmark"   type="text" class="form-control" name="landmark"  value="<%=userAddress.landmark%>"placeholder="Landmark" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="town"   type="text" class="form-control" name="town" value="<%=userAddress.town%>" placeholder="Town/city" required="required">
-                </div>
-                <div class="form-group">
-                    <input  id="state"   type="text" class="form-control" name="state" placeholder="State" value="<%=userAddress.state%>" required="required">
-                </div>
-                <div class="form-group" >
-                    <button type="submit" class="btn btn-primary btn-lg">SAVE CHANGES</button>
-                    <p id="err-msg"></p>
-                </div>
-            </form>
-        
-            
-    </div>
-    
     <script src="//cdn.tutorialjinni.com/jquery/3.6.1/jquery.min.js"></script>
     <script src="//cdn.tutorialjinni.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="//cdn.tutorialjinni.com/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
-    <script src="//g.tutorialjinni.com/mojoaxel/bootstrap-select-country/dist/js/bootstrap-select-country.min.js"></script>
+    <script
+      src="//g.tutorialjinni.com/mojoaxel/bootstrap-select-country/dist/js/bootstrap-select-country.min.js"></script>
+    <script>
+      function validateForm() {
+        const nameInput = document.getElementById('name');
+        const addressInput = document.getElementById('house');
+        const areaInput = document.getElementById('area');
+        const landmarkInput = document.getElementById('landmark');
+        const townInput = document.getElementById('town');
+        const stateInput = document.getElementById('state');
+        const postalCodeInput = document.getElementById('pin-code');
+        const phoneInput = document.getElementById('number');
+        const altNumberInput = document.getElementById('altNumber');
+
+        // Helper function to display error message
+        function showError(input, message) {
+          const errorElement = document.getElementById(input.id + 'Error');
+          errorElement.textContent = message;
+        }
+
+        // Helper function to clear error messages
+        function clearErrors() {
+          const inputs = [
+            nameInput,
+            addressInput,
+            areaInput,
+            landmarkInput,
+            townInput,
+            stateInput,
+            postalCodeInput,
+            phoneInput,
+            altNumberInput
+          ];
+          inputs.forEach((input) => {
+            const errorElement = document.getElementById(input.id + 'Error');
+            errorElement.textContent = '';
+          });
+        }
+
+        // Clear previous error messages
+        clearErrors();
+
+        // Validation for empty and whitespace-only inputs
+        if (nameInput.value.trim() === '') {
+          showError(nameInput, 'Name is required.');
+          return false;
+        }
+        if (!/^[A-Za-z]+$/.test(nameInput.value)) {
+          showError(nameInput, 'Name should contain only English characters.');
+          return false;
+        }
+        if (nameInput.value.length < 4 || nameInput.value.length > 15) {
+          showError(nameInput, 'Please Provide valid Name');
+          return false;
+        }
+
+        // Validation for empty and whitespace-only inputs
+        if (addressInput.value.trim() === '') {
+          showError(addressInput, 'Address is required.');
+          return false;
+        }
+
+        if (addressInput.value.length < 10 || addressInput.value.length > 80) {
+          showError(addressInput, 'Please Provide Valid Address.');
+          return false;
+        }
+
+        if (/\s{4,}/.test(addressInput.value)) {
+          showError(addressInput, 'Address cannot have more than 3 consecutive whitespace characters.');
+          return false;
+        }
+
+        if (/[%$#&.^]{4,}/.test(addressInput.value)) {
+          showError(addressInput, 'Address cannot have more than 3 consecutive symbols.');
+          return false;
+        }
+
+        // Validation for empty and whitespace-only inputs
+        if (areaInput.value.trim() === '') {
+          showError(areaInput, 'Area is required.');
+          return false;
+        }
+
+        if (/\s{3,}/.test(areaInput.value)) {
+          showError(areaInput, ' cannot have more than two consecutive white spaces.');
+          return false;
+        }
+
+        // Check for symbols or numbers
+        if (/[^a-zA-Z0-9\s,.]/.test(areaInput.value)) {
+          showError(areaInput, 'Town name cannot contain symbols.');
+          return false;
+        }
+
+        // Validation for empty and whitespace-only inputs
+        if (landmarkInput.value.trim() === '') {
+          showError(landmarkInput, 'landmark is required.');
+          return false;
+        }
+
+        if (/\s{3,}/.test(landmarkInput.value)) {
+          showError(landmarkInput, ' cannot have more than two consecutive white spaces.');
+          return false;
+        }
+
+        // Check for symbols or numbers
+        if (/[^a-zA-Z0-9\s,.]/.test(landmarkInput.value)) {
+          showError(landmarkInput, 'landmark cannot contain symbols.');
+          return false;
+        }
+
+        // Validation for empty and whitespace-only inputs
+        if (townInput.value.trim() === '') {
+          showError(townInput, 'town is required.');
+          return false;
+        }
+
+        if (/\s{3,}/.test(townInput.value)) {
+          showError(townInput, ' cannot have more than two consecutive white spaces.');
+          return false;
+        }
+
+        // Check for symbols or numbers
+        if (/[^a-zA-Z0-9\s.,]/.test(townInput.value)) {
+          showError(townInput, 'town name cannot contain symbols.');
+          return false;
+        }
+
+        // Validation for empty and whitespace-only inputs
+        if (stateInput.value.trim() === '') {
+          showError(stateInput, 'state is required.');
+          return false;
+        }
+
+        if (/\s{3,}/.test(stateInput.value)) {
+          showError(stateInput, ' cannot have more than two consecutive white spaces.');
+          return false;
+        }
+
+        // Check for symbols or numbers
+        if (/[^a-zA-Z0\s]/.test(stateInput.value)) {
+          showError(stateInput, 'State name cannot contain symbols.');
+          return false;
+        }
+
+        // Validation for postalCode inputs
+        if (!/^\d{6,8}$/.test(postalCodeInput.value)) {
+          showError(postalCodeInput, 'Please provide valid postalCode.');
+          return false;
+        }
+
+        //
+        if (phoneInput.value.replace(/\s/g, '').split('').filter((v, i, a) => a.indexOf(v) === i).length < 5) {
+          showError(phoneInput, 'Phone number must have at least 5 different numbers and contain no white spaces.');
+          return false;
+        }
+        if (!/^\d{10}$/.test(phoneInput.value)) {
+          showError(phoneInput, 'Phone number must contain exactly 10 digits and no other characters.');
+          return false;
+        }altNumberInput
+
+        //
+        if (altNumberInput.value.replace(/\s/g, '').split('').filter((v, i, a) => a.indexOf(v) === i).length < 5) {
+          showError(altNumberInput, 'Phone number must have at least 5 different numbers and contain no white spaces.');
+          return false;
+        }
+        if (!/^\d{10}$/.test(altNumberInput.value)) {
+          showError(altNumberInput, 'Phone number must contain exactly 10 digits and no other characters.');
+          return false;
+        }
+
+
+        // Your other validations go here...
+
+        // All validations passed, form can be submitted
+        return true;
+      }
+    </script>
 
 
 

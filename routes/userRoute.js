@@ -67,7 +67,17 @@ user_route.post("/addAdress", auth.isLogin,userController.confirmAddress)
 user_route.get("/editAdress", userController.editAddress)
 user_route.post("/editAdress", userController.confirmEdit)
 user_route.post("/removeAdd", userController.removeAddres)
-
+user_route.get("/edit-profile", auth.isLogin,userController.editProfile)
+user_route.get("/EditproFile", auth.isLogin,userController.editProFile)
+user_route.post("/updateUserProfile", auth.isLogin,userController.updateUserProfile)
+//forget-Password
+user_route.get('/forgotpassword',auth.isLogout,userController.foregetPassword)
+user_route.post('/forgotverify',auth.isLogout,userController.ForegetverifyPassword)
+user_route.get('/forgot-password',auth.isLogout,userController.changePassword)
+user_route.post('/forgot-password',userController.resetpassword)
+//change-Password
+user_route.get('/changePassword',auth.isLogin,userController.ChangePassword)
+user_route.post('/changePassword',auth.isLogin,userController.newPassword )
 //wallet
 user_route.get("/wallet",auth.isLogin,userController.wallet)
 user_route.post("/verifyPayment", userController.verifyRazorpayPayment)
