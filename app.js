@@ -1,6 +1,7 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
+const path = require('path')
 const session = require("express-session");
 const errorHandler = require("./middleware/errorhandler");
 
@@ -28,6 +29,9 @@ app.use(
   })
 );
 
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
 //for userRoute
 const userRoute = require("./routes/userRoute");
 app.use("/", userRoute);
@@ -35,6 +39,10 @@ app.use("/", userRoute);
 //for adminRoute
 const adminRoute = require("./routes/adminRoute");
 app.use("/admin", adminRoute);
+
+app.use((req, res, next) =>{
+  res.status(404).render('404')
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`server running on http://localhost:${process.env.PORT}/`);

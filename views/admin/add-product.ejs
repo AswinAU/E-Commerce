@@ -1,56 +1,64 @@
 <%- include('header') %>
-        <form action="/admin/add-product" class="content-main" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <div class="row">
-                <div class="col-9">
-                    <div class="content-header">
-                        <h2 class="content-title">Add New Product</h2>
-                        
-                        <div>
-                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
-                            <input type="submit" class="btn btn-md rounded font-sm hover-up" value="publish">
-                        </div>
+    <form action="/admin/add-product" class="content-main" method="post" enctype="multipart/form-data"
+        onsubmit="return validateForm()">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+
+                    <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <input type="submit" class="btn btn-md rounded font-sm hover-up" value="publish">
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Basic</h4>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Basic</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="mb-4">
+                            <label for="product_name" name="productName" class="form-label">Product title</label>
+                            <input type="text" placeholder="Type here" name="name" class="form-control"
+                                id="product_name" required>
+                            <div id="nameError" style="color: red;"></div>
                         </div>
-                        <div class="card-body">
-                            
-                            <div class="mb-4">
-                                <label for="product_name" name="productName" class="form-label">Product title</label>
-                                <input type="text" placeholder="Type here" name="name" class="form-control" id="product_name" required>
-                                <div id="nameError" style="color: red;"></div>
-                            </div>
+                        <div class="mb-4">
+                            <label for="product_description" name="productDescription" class="form-label">Full
+                                description</label>
+                            <textarea placeholder="Type here" name="description" class="form-control" rows="4"
+                                id="product_description" required></textarea>
+                            <div id="discriptionError" style="color: red;"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
                                 <div class="mb-4">
-                                    <label for="product_description" name="productDescription"class="form-label">Full description</label>
-                                    <textarea placeholder="Type here" name="description" class="form-control" rows="4"  id="product_description" required></textarea>
-                                    <div id="discriptionError" style="color: red;"></div>
+                                    <label class="form-label">Regular price</label>
+                                    <div class="row gx-2">
+                                        <input placeholder="" type="number" min="0" name="regular_price"
+                                            id="regularprice" class="form-control" required>
+                                            <div id="regularpriceError" style="color: red;"></div>
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label" >Regular price</label>
-                                            <div class="row gx-2">
-                                                <input placeholder="" type="number" min="0" name="regular_price" id="regularprice"  class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Sales_price</label>
-                                            <input placeholder="" name="sale_price" type="number" min="0" id="saleprice" class="form-control" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Offer percentage</label>
-                                            <input name="product_offer_price" placeholder="%" type="text" class="form-control">
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- <div class="col-lg-4">
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Sales_price</label>
+                                    <input placeholder="" name="sale_price" type="number" min="0" id="saleprice"
+                                        class="form-control" required>
+                                        <div id="salepriceError" style="color: red;"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Offer percentage</label>
+                                    <input name="product_offer_price" placeholder="%" type="number" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-4">
                                         <label class="form-label">Currency</label>
                                         <select class="form-select">
                                             <option> IND </option>
@@ -58,120 +66,163 @@
                                             <option> USD </option>
                                         </select>
                                     </div> -->
-                                    <div class="col-lg-4">
-                                        <label class="form-label">Category</label>
-                                        <select class="form-select" name="category">
-                                            <% data.forEach(function(item) { %>
-                                                <option><%= item.category %></option>
-                                              <% }); %>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">quantity</label>
-                                            <input placeholder="" name="quantity" type="number" min="0" id="quantity"   class="form-control" required>
-                                        </div>
-                                    </div>
+                            <div class="col-lg-4">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" name="category">
+                                    <% data.forEach(function(item) { %>
+                                        <option>
+                                            <%= item.category %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">quantity</label>
+                                    <input placeholder="" name="quantity" type="number" min="0" id="quantity"
+                                        class="form-control" required>
+                                        <div id="quantityError" style="color: red;"></div>
                                 </div>
-                                <!-- <div class="mb-4">
+                            </div>
+                        </div>
+                        <!-- <div class="mb-4">
                                     <label class="form-label">Tax rate</label>
                                     <input type="number" min="0" placeholder="%" name="gst" class="form-control" id="taxrate" id="product_name" required>
                                 </div> -->
 
-                               
-                          
-                        </div>
+
+
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Media</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="input-upload">
-                                <img src="admin-assets/imgs/theme/upload.svg" alt="">
-                                <input name="image" class="form-control" accept="image/*"  type="file" multiple>
-                            </div>
-                        </div>
-                    </div> <!-- card end// -->
-              
             </div>
-        </form>
-        
-        <!-- content-main end// -->
-        <footer class="main-footer font-xs"> 
-            <div class="row pb-30 pt-15">
-                <div class="col-sm-6">
-                    <script>
+            <div class="col-lg-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Media</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <img src="admin-assets/imgs/theme/upload.svg" alt="">
+                            <input name="image" class="form-control" accept="image/*" type="file" multiple>
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+
+            </div>
+    </form>
+
+    <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
                     document.write(new Date().getFullYear())
-                    </script> ©, Evara - HTML Ecommerce Template .
-                </div>
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
 
 
 
-                
-                
-                <div class="col-sm-6">
-                    <div class="text-sm-end">
-                        All rights reserved
-                    </div>
+
+
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
                 </div>
             </div>
-        </footer>
+        </div>
+    </footer>
     </main>
     <script>
         function validateForm() {
-                // Reset error messages
-                document.getElementById('nameError').textContent = '';
-                document.getElementById('discriptionError').textContent = '';
-    
-               
-    
-                // Get the values from the form
-                const productName = document.getElementById('product_name').value;
-                const productdescription = document.getElementById('product_description').value;
-                
-                    
-                const  maxProductNameLength = 50; 
-                const  maxProductDescriptionLength = 250;
-    
-    
-    
-    
-    
-    
-                // Check for spaces or empty product name
-                if (productName.trim() === '') {
-                    document.getElementById('nameError').textContent = 'Product title cannot be empty.';
-                    return false; // Prevent form submission
-                }
-              
-                if (productName.length > maxProductNameLength) {
+            // event.preventDefault()
+            // Reset error messages
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('discriptionError').textContent = '';
+            document.getElementById('salepriceError').textContent = '';
+            document.getElementById('regularpriceError').textContent = '';
+            document.getElementById('quantityError').textContent = '';
+
+            // Get the values from the form
+            const productName = document.getElementById('product_name').value;
+            const productdescription = document.getElementById('product_description').value;
+            console.log('hhhh',productdescription);
+            const salesPrice = document.getElementById('saleprice').value;
+            console.log('kkk',salesPrice);
+
+            const productPrice = document.getElementById('regularprice').value;
+            const quantity = document.getElementById('quantity').value;
+
+            const maxProductNameLength = 50;
+            const maxProductDescriptionLength = 250;
+
+
+            // Check for spaces or empty product name
+            if (productName.trim() === '') {
+                document.getElementById('nameError').textContent = 'Product title cannot be empty.';
+                return false; // Prevent form submission
+            }
+
+            if (!productName.match(/^[a-z ,.'-]+$/i)) {
+                document.getElementById('nameError').textContent = 'Product name should not include special characters';
+                return false; // Prevent form submission
+            }
+
+            if (productName.length > maxProductNameLength) {
                 document.getElementById('nameError').textContent = 'Product title is too long.';
                 return false; // Prevent form submission
             }
-    
-    
-    
-    
-                
-                if (productdescription.trim() === '') {
-                    document.getElementById('discriptionError').textContent = 'Product discription cannot be empty.';
-                    return false; // Prevent form submission
-                }
-    
-                if (productdescription.length > maxProductDescriptionLength) {
+
+            const maxNameLength = 50;
+            if (productName.length > maxNameLength) {
+                document.getElementById('nameError').textContent = 'Product name exceeds the maximum limit.';
+                return false; // Prevent form submission
+            }
+
+             if (productdescription.trim() === '') {
+                document.getElementById('discriptionError').textContent = 'Product discription cannot be empty.';
+                return false; // Prevent form submission
+            }
+
+            if (productdescription.length > maxProductDescriptionLength) {
                 document.getElementById('discriptionError').textContent = 'Product description is too long.';
                 return false; // Prevent form submission
             }
-    
-                
-                
-                
-                return true; // Allow form submission if all validations pass
-            }  
-    
+
+            ////////////////
+            if (salesPrice.trim() === '') {
+                document.getElementById('salepriceError').textContent = 'saleprice price is required.';
+                return false; // Prevent form submission
+            }
+            if ((salesPrice !== '') && parseFloat(salesPrice) <= 0) {
+                document.getElementById('salepriceError').textContent = 'saleprice price must be a greater than zero.';
+                return false;
+            }
+
+            if (productPrice.trim() === '') {
+                document.getElementById('regularpriceError').textContent = 'Regular price is required.';
+                return false;
+            }
+            if (isNaN(productPrice) || parseFloat(productPrice) <= 0) {
+                document.getElementById('regularpriceError').textContent = 'Regular price must be greater than zero.';
+                return false;
+            }
+
+
+            if (quantity.trim() === '') {
+                document.getElementById('quantityError').textContent  = 'Quantity is required.';
+                return false;
+            }
+            if (parseFloat(quantity) <= 0) {
+                document.getElementById('quantityError').textContent  = 'Quantity must be greater than zero.';
+                return false;
+            }
+
+
+
+
+            return true; // Allow form submission if all validations pass
+        }
+
     </script>
     <script src="/public/admin-assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/public/admin-assets/js/vendors/bootstrap.bundle.min.js"></script>
@@ -183,8 +234,7 @@
 
 
 
-<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-form-product-1.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:32 GMT -->
+    <!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-form-product-1.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:32 GMT -->
 
 
 
-<%include("../layouts/adminFooter.ejs")%>

@@ -21,11 +21,12 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form action="/admin/add-category" method="post" enctype="multipart/form-data">
+                        <form action="/admin/add-category" method="post" enctype="multipart/form-data" onsubmit="return validateCategory()">
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
                                 <input name="category" type="text" placeholder="Type here" class="form-control"
                                     id="product_name" required="true" />
+                                    <p id="product_name_error" class="text-danger"></p>
 
                                 <% if(locals.error){%>
                                     <p class="text-danger">
@@ -157,7 +158,41 @@
         }
     </script>
     
-
+    <script>
+        // Function to validate the category name
+        function validateCategory() {
+            // Get the category name input element and its associated error message element
+            var categoryNameInput = document.getElementById('product_name');
+            var categoryNameError = document.getElementById('product_name_error');
+    
+            // Get the value of the category name
+            var categoryName = categoryNameInput.value.trim();
+    
+            // Reset the previous error message
+            categoryNameError.innerText = '';
+    
+            // Check if the category name is empty
+            if (categoryName === '') {
+                categoryNameError.innerText = 'Category name cannot be empty';
+                return false;
+            }
+    
+            // Check if the category name contains numbers or special characters
+            if (/[\d~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\.]/.test(categoryName)) {
+                categoryNameError.innerText = 'Category name should not contain numbers or special characters';
+                return false;
+            }
+    
+            // Add more validation rules as needed
+    
+            return true; // Return true to allow form submission
+        }
+    
+        // Attach the validateCategory function to the form's onsubmit event
+        document.getElementById('addCategoryForm').onsubmit = validateCategory;
+    </script>
+    
+    
 
 
 

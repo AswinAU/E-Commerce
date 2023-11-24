@@ -24,7 +24,8 @@ module.exports = {
         currentPage,
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -35,7 +36,8 @@ module.exports = {
       const currentPage = '/admin/add-product';
       res.render("add-product", { data: findCategory ,currentPage});
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -99,7 +101,8 @@ module.exports = {
         });
       }
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -113,7 +116,8 @@ module.exports = {
         res.render("edit-product", { data: data ,  Data: findCategory , currentPage });
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -206,7 +210,8 @@ module.exports = {
       
     } catch (err) {
       console.log('entered pani paaali');
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
   
@@ -219,7 +224,8 @@ module.exports = {
         res.render("product-details", { data, log: req.session.isLoggedIn });
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -232,7 +238,8 @@ module.exports = {
         res.redirect("/admin/all-products");
       })
       .catch((err) => {
-        next(err);
+        // next(err);
+        res.render('404')
       });
   },
 
@@ -250,7 +257,8 @@ module.exports = {
           res.status(200).json({ message: 'Product image deleted successfully', product: findProduct });
       }
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   }
 

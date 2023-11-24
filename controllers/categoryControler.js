@@ -14,7 +14,8 @@ module.exports = {
         res.render("page-categories", { data , currentPage });
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -41,8 +42,8 @@ module.exports = {
         .lean();
       res.render("page-categories", { data, currentPage, totalPages, search });
     } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal Server Error"); // Handle the error appropriately
+      console.error("Internal Server Error");
+      res.render('404')// Handle the error appropriately
     }
   },
 
@@ -81,7 +82,8 @@ module.exports = {
       req.session.categoryError = true;
 
       res.redirect("back");
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -95,7 +97,8 @@ module.exports = {
         res.render("edit-category", { data: data , currentPage});
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -140,7 +143,8 @@ module.exports = {
     } catch (err) {
       req.session.categoryError = true;
       res.redirect("/edit-C/:id");
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -151,7 +155,8 @@ module.exports = {
         res.redirect("/admin/categories");
       });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -164,7 +169,8 @@ module.exports = {
 
       res.render("page-categories", { data });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 };

@@ -7,6 +7,7 @@ const auth = require("../middleware/adminAuth");
 const valid = require("../middleware/imageValidation");
 const categoryController = require("../controllers/categoryControler");
 const categoryUpload = require("../multer/category-multer");
+const salesController = require("../controllers/salesController")
 const productController = require("../controllers/productController");
 const productUpload = require("../multer/product-upload");
 const { route } = require("./userRoute");
@@ -24,6 +25,7 @@ admin_route.set("view engine", "ejs");
 admin_route.set("views", "./views/admin");
 
 //load login
+
 admin_route.get("/",  adminController.loadLogin);
 admin_route.post("/",  adminController.verifyLogin);
 
@@ -107,12 +109,8 @@ admin_route.get("/editCoupon", auth.isLogin, couponController.editCoupon);
 admin_route.post("/updateCoupon", auth.isLogin, couponController.updateCoupon);
 
 admin_route.get("/monthly-report", auth.isLogin,adminController.monthlyreport)
-admin_route.get("/salesReport", auth.isLogin, adminController.SalesReoprt);
-admin_route.get("/salesToday", auth.isLogin,adminController.salesToday)
-admin_route.get("/salesWeekly", auth.isLogin,adminController.salesWeekly)
-admin_route.get("/salesMonthly",auth.isLogin, adminController.salesMonthly)
-admin_route.get("/salesYearly", auth.isLogin,adminController.salesYearly)
-
+admin_route.get('/salesreport', auth.isLogin, salesController.salesReport)
+admin_route.get('/reports/sales/download/:type',  auth.isLogin, salesController.adminDownloadReports);
 admin_route.post('/deletedproduct',auth.isLogin,productController.deleteProductImage)
 admin_route.use(errorHandler);
 module.exports = admin_route;

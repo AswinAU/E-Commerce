@@ -19,7 +19,8 @@ const loadHome = async (req, res, next) => {
   try {
     res.render("landing-page", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -33,7 +34,8 @@ const loadRegister = async (req, res, next) => {
 
     res.render("registration", { message: false });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -108,7 +110,8 @@ const insertUser = async (req, res, next) => {
     }
   } catch (err) {
     // Handle errors
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -194,7 +197,7 @@ const validateOtp = async (req, res) => {
         { $set: { is_verified: 1 } }
       );
 
-      res.render("login",{message: false});
+      res.render("login",{message: "successfully registered"});
     }
   } catch (error) {
     console.log(error.message);
@@ -210,7 +213,8 @@ const loginLoad = async (req, res, next) => {
       res.render("login", { message: false });
     }
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -296,7 +300,8 @@ const verifyLogin = async (req, res, next) => {
       res.render("login", { message: `Email or password is incorrect` });
     }
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -305,7 +310,8 @@ const loadLogin = async (req, res, next) => {
   try {
     res.render("userHome", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -315,7 +321,8 @@ const logOut = async (req, res, next) => {
     req.session.destroy();
     res.redirect("/");
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -357,7 +364,9 @@ const profile = async (req, res, next) => {
       res.render("myProfile", { data, userdata, log: req.session.isLoggedIn });
     });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
+    
   }
 };
 
@@ -368,7 +377,8 @@ const addressForm = async (req, res, next) => {
       res.render("add-address", { data, log: req.session.isLoggedIn });
     });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -398,7 +408,8 @@ const confirmAddress = async (req, res, next) => {
     );
     res.redirect("/address");
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -413,7 +424,8 @@ const editAddress = async (req, res, next) => {
 
     res.render("editaddress", { userAddress, log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -439,7 +451,8 @@ const confirmEdit = async (req, res, next) => {
 
     res.redirect("/address");
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -494,7 +507,8 @@ const updateUserProfile = async (req, res, next) => {
       console.log(updateUser,'updateUser');
     res.redirect("/edit-profile");
   } catch (err) {
-    next(err)
+    // next(err)
+    res.render('404')
   }
 };
 
@@ -503,7 +517,8 @@ const foregetPassword = async (req, res) => {
   try {
     res.render("forget-password", { message: false });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -530,7 +545,8 @@ const ForegetverifyPassword = async (req, res) => {
       res.render("forget-password", { message: "Email is incorrect" });
     }
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -566,7 +582,8 @@ const sendresetpasswordMail = async (name, email, token) => {
       }
     });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -581,7 +598,8 @@ const changePassword = async (req, res) => {
       res.render("users/404", { message: "token is invalid" });
     }
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -598,7 +616,8 @@ const resetpassword = async (req, res) => {
     );
     res.redirect("/");
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -654,7 +673,8 @@ const products = async (req, res, next) => {
       res.render("Shop", { data });
     });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -674,7 +694,8 @@ const checkout = async (req, res, next) => {
       console.log(data[0].cart[0], "datadatadatadata");
     });
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -785,7 +806,7 @@ const confirmation = async (req, res, next) => {
       res.json({ payment: true, method: "cod", order: order });
     }
   } catch (err) {
-    next(err);
+
     res.status(500).send("Internal Server Error");
   }
 };
@@ -908,8 +929,7 @@ const ShowOrders = async (req, res, next) => {
       log: req.session.isLoggedIn,
     });
   } catch (err) {
-    next(err);
-    res.send("Error");
+    res.render('404')
   }
 };
 
@@ -952,7 +972,7 @@ const orderDetails = async (req, res, next) => {
       log: req.session.isLoggedIn,
     });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1060,7 +1080,7 @@ const wallet = (req, res, next) => {
       });
     });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1090,7 +1110,7 @@ const subCategory = async (req, res, next) => {
       });
     })
     .catch((err) => {
-      next(err);
+      res.render('404')
     });
 };
 
@@ -1124,7 +1144,7 @@ const priceFilter = async (req, res, next) => {
       currentPage: currentPage,
     });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1169,6 +1189,7 @@ const filteredProducts = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
+    
     // Handle errors appropriately
   }
 };
@@ -1181,7 +1202,7 @@ const searchProd = async (req, res, next) => {
     });
     res.render("Shop", { data, log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1190,7 +1211,7 @@ const orderSucceed = async (req, res, next) => {
   try {
     res.render("ordersucceed", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1199,7 +1220,7 @@ const orderFailure = async (req, res, next) => {
   try {
     res.render("orderFailure", { log: req.session.isLoggedIn });
   } catch (err) {
-    next(err);
+    res.render('404')
   }
 };
 
@@ -1298,7 +1319,7 @@ const downloadInvoice = async (req, res, next) => {
 
     pdfStream.pipe(res);
   } catch (err) {
-    next(err);
+    res.render('404')
     //   res.status(500).json({ error: error.message });
   }
 };

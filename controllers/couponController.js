@@ -15,6 +15,7 @@ const loadCoupon=asyncHandler(async(req,res)=>{
         
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion loadCoupon',error);
+        res.render('404')
     }
 })
 //-----------------------------------------
@@ -65,7 +66,7 @@ const addCoupon = asyncHandler(async (req, res) => {
   } catch (error) {
     console.log('Error happened in the coupon controller in the function addCoupon', error);
     // Handle error, e.g., display an error message to the user
-    res.status(400).send(error.message);
+    res.render('404')
   }
 });
 
@@ -100,7 +101,7 @@ const coupon=asyncHandler(async(req,res)=>{
         
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion coupon',error);
-        
+        res.render('404')
     }
 })
 //---------------------------------------------------
@@ -126,7 +127,7 @@ const deleteCoupon=asyncHandler(async(req,res)=>{
 
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion deleteCoupon',error);
-        
+        res.render('404')
     }
 })
 //--------------------------------------------------------------------
@@ -147,7 +148,7 @@ const editCoupon=asyncHandler(async(req,res)=>{
         
     } catch (error) {
         console.log('Error happence in the coupon controller in the funtion editCoupon',error);
-        
+        res.render('404')
     }
 })
 //------------------------------------------------------
@@ -199,7 +200,7 @@ const updateCoupon = asyncHandler(async (req, res) => {
   } catch (error) {
     console.log('Error happened in the coupon controller in the function editCoupon', error);
     // Handle error, e.g., display an error message to the user
-    res.status(400).send(error.message);
+    res.render('404')
   }
 });
 

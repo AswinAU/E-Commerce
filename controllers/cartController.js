@@ -60,7 +60,8 @@ module.exports = {
         });
       }
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -114,7 +115,8 @@ module.exports = {
         res.render("cart", { user, log: req.session.isLoggedIn });
       }
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -183,7 +185,8 @@ module.exports = {
           res.json(false);
         });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -299,7 +302,8 @@ module.exports = {
 
       // res.render('user/whishlist',{ isLoggedIn: req.session.isLoggedIn,data:whishlistProducts,total:totalPrice })
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -317,7 +321,8 @@ module.exports = {
           res.json(false);
         });
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 
@@ -343,7 +348,8 @@ module.exports = {
     );
 
     } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
     }
   },
 

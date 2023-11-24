@@ -12,7 +12,9 @@ const loadLogin = async (req, res, next) => {
   try {
     res.render("adminLogin", { message: false });
   } catch (err) {
-    next(err);
+    console.log('err');
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -50,7 +52,8 @@ const verifyLogin = async (req, res, next) => {
       res.render("adminLogin", { message: "Email and password are incorrect" });
     }
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -63,7 +66,8 @@ const loadDashboard = async (req, res, next) => {
     const currentPage = '/admin/adminHome';
     res.render("adminHome",{currentPage}); // Updated argument names
   } catch (err) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -73,7 +77,8 @@ const logout = async (req, res, next) => {
     req.session.destroy();
     res.redirect("/admin");
   } catch (error) {
-    next(err);
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -95,7 +100,8 @@ const userslist = async (req, res, next) => {
           totalPages: Math.ceil(totalUsers / limit)
       });
   } catch (err) {
-      next(err);
+      // next(err);
+      res.render('404')
   }
 };
 
@@ -129,7 +135,7 @@ const unblockUser = async (req, res, next) => {
     res.status(200).send('User unblocked successfully'); // Send a success response back to the client
   } catch (err) {
     console.error('Error unblocking user:', err);
-    res.status(500).send('Internal Server Error'); // Send an error response back to the client
+    res.render('404')// Send an error response back to the client
   }
 };
 
@@ -183,11 +189,11 @@ const ShowOrders = async (req, res, next) => {
       { $limit: itemsperpage },
     ]);
     const currentPage = '/admin/order-list';
-    const totalPages = Math.ceil(count / itemsperpage);
+    const totalPages = Math.ceil( itemsperpage);
     res.render("orders-list", { orders, totalPages, page , currentPage });
   } catch (err) {
-    next(err);
-    res.send("Error");
+    // next(err);
+    res.render('404')
   }
 };
 
@@ -210,7 +216,7 @@ const orderDetail = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal Server Error");
+    res.render('404')
   }
 };
 
@@ -302,229 +308,6 @@ const monthlyreport = async (req, res) => {
   }
 };
 
-const SalesReoprt = (req, res) => {
-  console.log(req.query.day);
-  if (req.query.day) {
-    res.redirect(`/admin/${req.query.day}`);
-  } else {
-    res.redirect(`/admin/salesToday`);
-  }
-};
-
-const salesToday = async (req, res) => {
-  let todaysales = new Date();
-  const startOfDay = new Date(
-    todaysales.getFullYear(),
-    todaysales.getMonth(),
-    todaysales.getDate(),
-    0,
-    0,
-    0,
-    0
-  );
-  const endOfDay = new Date(
-    todaysales.getFullYear(),
-    todaysales.getMonth(),
-    todaysales.getDate(),
-    23,
-    59,
-    59,
-    999
-  );
-
-  try {
-    const orders = await orderModel
-      .aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startOfDay,
-              $lt: endOfDay,
-            },
-            orderStatus: "Delivered",
-          },
-        },
-      ])
-      .sort({ createdAt: -1 });
-    // const productIds = orders.map((order) => order.product.productId);
-    // const products = await product.find({
-    //   _id: { $in: productIds },
-    // });
-    console.log(orders);
-    const itemsperpage = 3;
-    const currentpage = parseInt(req.query.page) || 1;
-    const startindex = (currentpage - 1) * itemsperpage;
-    const endindex = startindex + itemsperpage;
-    const totalpages = Math.ceil(orders.length / 3);
-    const currentproduct = orders.slice(startindex, endindex);
-    const currentPage = '/admin/salesToday';
-    res.render("salesReport", {
-      order: currentproduct,
-      currentpage,
-      totalpages,
-      currentPage,
-      //product: products,
-      salesToday: true,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
-const salesWeekly = async (req, res) => {
-  const currentDate = new Date();
-
-  const startOfWeek = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate() - currentDate.getDay()
-  );
-  const endOfWeek = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate() + (6 - currentDate.getDay()),
-    23,
-    59,
-    59,
-    999
-  );
-
-  console.log(currentDate < endOfWeek);
-  console.log(endOfWeek);
-  const orders = await orderModel.aggregate([
-    {
-      $match: {
-        createdAt: {
-          $gte: startOfWeek,
-          $lt: endOfWeek,
-        },
-        orderStatus: "Delivered",
-      },
-    },
-    {
-      $sort: { createdAt: -1 },
-    },
-  ]);
-  currentPage = '/admin/salesWeekly'
-  const itemsperpage = 3;
-  const currentpage = parseInt(req.query.page) || 1;
-  const startindex = (currentpage - 1) * itemsperpage;
-  const endindex = startindex + itemsperpage;
-  const totalpages = Math.ceil(orders.length / 5);
-  const currentproduct = orders.slice(startindex, endindex);
-  res.render("salesReport", {
-    order: currentproduct,
-    salesWeekly: true,
-    totalpages,
-    currentpage,
-    currentPage,
-  });
-};
-
-const salesMonthly = async (req, res) => {
-  const thisMonth = new Date().getMonth() + 1;
-  const startofMonth = new Date(
-    new Date().getFullYear(),
-    thisMonth - 1,
-    1,
-    0,
-    0,
-    0,
-    0
-  );
-  const endofMonth = new Date(
-    new Date().getFullYear(),
-    thisMonth,
-    0,
-    23,
-    59,
-    59,
-    999
-  );
-
-  try {
-    const orders = await orderModel
-      .aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startofMonth,
-              $lt: endofMonth,
-            },
-            orderStatus: "Delivered",
-          },
-        },
-      ])
-      .sort({ createdAt: -1 });
-    // const productIds = orders.map((order) => order.product.productId);
-    // const products = await product.find({
-    //   _id: { $in: productIds },
-    // });
-    const itemsperpage = 3;
-    const currentpage = parseInt(req.query.page) || 1;
-    const startindex = (currentpage - 1) * itemsperpage;
-    const endindex = startindex + itemsperpage;
-    const totalpages = Math.ceil(orders.length / 3);
-    const currentproduct = orders.slice(startindex, endindex);
-    currentPage = '/admin/salesMonthly'
-    res.render("salesReport", {
-      order: currentproduct,
-      totalpages,
-      currentpage,
-      currentPage,
-      salesMonthly: true,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
-const salesYearly = async (req, res) => {
-  const today = new Date().getFullYear();
-  const startofYear = new Date(today, 0, 1, 0, 0, 0, 0);
-  const endofYear = new Date(today, 11, 31, 23, 59, 59, 999);
-
-  try {
-    const orders = await orderModel
-      .aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startofYear,
-              $lt: endofYear,
-            },
-            orderStatus: "Delivered",
-          },
-        },
-      ])
-      .sort({ createdAt: -1 });
-    console.log(orders, "ods");
-    // const products = await product.find({
-    //   _id: { $in: productIds },
-    // });
-    const itemsperpage = 5;
-    const currentpage = parseInt(req.query.page) || 1;
-    const startindex = (currentpage - 1) * itemsperpage;
-    const endindex = startindex + itemsperpage;
-    const totalpages = Math.ceil(orders.length / 5);
-    const currentproduct = orders.slice(startindex, endindex);
-    currentPage = '/admin/salesYearly'
-    res.render("salesReport", {
-      order: currentproduct,
-      totalpages,
-      currentpage,
-      currentPage,
-      // product: products,
-      salesYearly: true,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
 
 module.exports = {
   loadLogin,
@@ -538,10 +321,5 @@ module.exports = {
   orderDetail,
   changeStatus,
   monthlyreport,
-  SalesReoprt,
-  salesToday,
-  salesWeekly,
-  salesMonthly,
-  salesYearly,
 
 };
