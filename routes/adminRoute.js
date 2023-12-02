@@ -1,6 +1,4 @@
 const express = require("express");
-const config = require("../config/config");
-const session = require("express-session");
 const adminController = require("../controllers/adminController");
 const couponController = require("../controllers/couponController");
 const auth = require("../middleware/adminAuth");
@@ -10,23 +8,13 @@ const categoryUpload = require("../multer/category-multer");
 const salesController = require("../controllers/salesController")
 const productController = require("../controllers/productController");
 const productUpload = require("../multer/product-upload");
-const { route } = require("./userRoute");
 const errorHandler = require("../middleware/errorhandler");
-
+const bannerController = require('../controllers/bannerController')
+const bannerUpload = require('../multer/banner-multer')
 const admin_route = express();
-admin_route.use(session({ secret: config.sessionSecret }));
-
-admin_route.use(express.static("public"));
-
-admin_route.use(express.json());
-admin_route.use(express.urlencoded({ extended: true }));
-
-admin_route.set("view engine", "ejs");
-admin_route.set("views", "./views/admin");
 
 //load login
-
-admin_route.get("/",  adminController.loadLogin);
+admin_route.get("/",  auth.isLogOut,adminController.loadLogin);
 admin_route.post("/",  adminController.verifyLogin);
 
 //load dashboard
@@ -112,5 +100,11 @@ admin_route.get("/monthly-report", auth.isLogin,adminController.monthlyreport)
 admin_route.get('/salesreport', auth.isLogin, salesController.salesReport)
 admin_route.get('/reports/sales/download/:type',  auth.isLogin, salesController.adminDownloadReports);
 admin_route.post('/deletedproduct',auth.isLogin,productController.deleteProductImage)
+// banner
+admin_route.get("/banner", auth.isLogin, bannerController.loadBanner);
+admin_route.post("/banner", auth.isLogin,bannerUpload.single('bannerImage'), bannerController.createBanner);
+admin_route.get("/bannerList", auth.isLogin, bannerController.bannerList);
+admin_route.get("/edit-banner/:id", auth.isLogin, bannerController.editBannerPage);
+admin_route.post("/edit-banner/:id", auth.isLogin,bannerUpload.single('bannerImage'), bannerController.editBanner);
 admin_route.use(errorHandler);
 module.exports = admin_route;

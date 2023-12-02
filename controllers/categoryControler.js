@@ -1,6 +1,5 @@
 const { Rembg } = require("rembg-node");
 const rembg = new Rembg();
-//const sharp = require('sharp');
 const categoryModel = require("../model/category-model");
 const productModel = require("../model/product-model");
 const productController = require("../controllers/productController");
@@ -14,7 +13,6 @@ module.exports = {
         res.render("page-categories", { data , currentPage });
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -59,7 +57,7 @@ module.exports = {
         .lean();
 
       if (!existingCategory) {
-        const category = new categoryModel({
+        const category = new categoryModel({ 
           category: cat.category,
           category_offer_price: cat.category_offer_price,
           // description: cat.description,
@@ -80,9 +78,6 @@ module.exports = {
       }
     } catch (err) {
       req.session.categoryError = true;
-
-      res.redirect("back");
-      // next(err);
       res.render('404')
     }
   },
@@ -97,7 +92,6 @@ module.exports = {
         res.render("edit-category", { data: data , currentPage});
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -118,14 +112,6 @@ module.exports = {
       existingCategory.category_offer_price = updatedCategoryData.category_offer_price;
       existingCategory.description = updatedCategoryData.description;
 
-      // Check if an image file is uploaded
-      // if (req.file) {
-      //     const input = req.file.path;
-      //     const output = await rembg.remove(input);
-      //     await output.webp().toFile("./public/upload/category/" + req.file.filename);
-      //     existingCategory.image = req.file.filename;
-      // }
-
       await existingCategory.save();
 
       const products = await productModel.find({ category: existingCategory.category });
@@ -143,7 +129,6 @@ module.exports = {
     } catch (err) {
       req.session.categoryError = true;
       res.redirect("/edit-C/:id");
-      // next(err);
       res.render('404')
     }
   },
@@ -155,7 +140,6 @@ module.exports = {
         res.redirect("/admin/categories");
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -169,7 +153,6 @@ module.exports = {
 
       res.render("page-categories", { data });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },

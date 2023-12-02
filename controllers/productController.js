@@ -1,7 +1,7 @@
 const categoryModel = require("../model/category-model");
 const productModel = require("../model/product-model");
-const sharp = require("sharp");
-const fs = require("fs");
+// const sharp = require("sharp");
+// const fs = require("fs");
 
 module.exports = {
   //view added products
@@ -24,7 +24,6 @@ module.exports = {
         currentPage,
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -36,7 +35,6 @@ module.exports = {
       const currentPage = '/admin/add-product';
       res.render("add-product", { data: findCategory ,currentPage});
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -101,7 +99,6 @@ module.exports = {
         });
       }
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -116,7 +113,6 @@ module.exports = {
         res.render("edit-product", { data: data ,  Data: findCategory , currentPage });
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -125,14 +121,8 @@ module.exports = {
   editProduct: async (req, res, next) => {
     console.log('entered--edit-product');
     try {
-      //console.log(req._id.toString(),'ididididid');
-      console.log('entered--edit-product----try');
-      //console.log(req.params.id,'req.params.id');
-      console.log(req,'reqqqq');
-      //console.log(req._id.toString(),'---------log---');
       let id = req._id||req.params.id;
       id = id.toString()
-      console.log(id,'--------id-------');
       const {
         name,
         description,
@@ -149,12 +139,8 @@ module.exports = {
 
       const category = await categoryModel.findOne({ category: req.category||req.body.category });
       const categori = category.category;
-      console.log(category,'categorycategory');
       const category_offer_price = category.category_offer_price;
-      console.log(category_offer_price,'category_offer_price');
-  
-      //category-offer-price
-      // const category_offer_price = category.category_offer_price;
+
       const category_discount = (sale_price * category_offer_price) / 100;
       const category_discount_price = sale_price - category_discount;
 
@@ -209,8 +195,6 @@ module.exports = {
 
       
     } catch (err) {
-      console.log('entered pani paaali');
-      // next(err);
       res.render('404')
     }
   },
@@ -224,7 +208,6 @@ module.exports = {
         res.render("product-details", { data, log: req.session.isLoggedIn });
       });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -257,7 +240,6 @@ module.exports = {
           res.status(200).json({ message: 'Product image deleted successfully', product: findProduct });
       }
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   }

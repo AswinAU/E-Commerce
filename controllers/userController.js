@@ -9,6 +9,7 @@ const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
 const catMOdel = require("../model/category-model");
 const coupounModel = require("../model/coupenModel");
+const Banner = require('../model/banner-model')
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
 const easyinvoice = require("easyinvoice");
@@ -17,9 +18,9 @@ const { Readable } = require("stream");
 // load landing-page
 const loadHome = async (req, res, next) => {
   try {
-    res.render("landing-page", { log: req.session.isLoggedIn });
+    const banners = await Banner.find();
+    res.render("landing-page", { log: req.session.isLoggedIn ,banners});
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -34,7 +35,6 @@ const loadRegister = async (req, res, next) => {
 
     res.render("registration", { message: false });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -45,7 +45,7 @@ const otppage = async (req, res) => {
   try {
     res.render("otp", { userId: req.query.id });
   } catch (error) {
-    console.log(error.message);
+    res.render('404')
   }
 };
 
@@ -109,8 +109,6 @@ const insertUser = async (req, res, next) => {
       res.render("registration", { message: "your registerarion Failed" });
     }
   } catch (err) {
-    // Handle errors
-    // next(err);
     res.render('404')
   }
 };
@@ -122,6 +120,7 @@ const securePassword = async (password) => {
     return passwordHash;
   } catch (error) {
     console.log(error.message);
+    res.render('404')
   }
 };
 
@@ -160,6 +159,7 @@ const sendVerifyMail = async (name, email, otp) => {
     });
   } catch (error) {
     console.log(error.message);
+    res.render('404')
   }
 };
 
@@ -175,6 +175,7 @@ const resendOtp = async (req, res) => {
     res.redirect(`otp?id=${userData._id}`);
   } catch (error) {
     console.log(error.message);
+    res.render('404')
   }
 };
 
@@ -201,6 +202,7 @@ const validateOtp = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.render('404')
   }
 };
 
@@ -213,7 +215,6 @@ const loginLoad = async (req, res, next) => {
       res.render("login", { message: false });
     }
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -240,9 +241,9 @@ const verifyLogin = async (req, res, next) => {
     if (userData) {
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
-      req.session.user = userData;
-      console.log(req.session.user);
+  
       if (req.session.referel) {
+        req.session.user = userData;
         console.log(req.session.referel,'req.session.referel');
         const refererId = req.session.referel;
         const userId = req.session.user;
@@ -300,7 +301,6 @@ const verifyLogin = async (req, res, next) => {
       res.render("login", { message: `Email or password is incorrect` });
     }
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -308,9 +308,10 @@ const verifyLogin = async (req, res, next) => {
 //load-userhome
 const loadLogin = async (req, res, next) => {
   try {
-    res.render("userHome", { log: req.session.isLoggedIn });
+     const banners = await Banner.find();
+    
+    res.render("userHome", { log: req.session.isLoggedIn, banners });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -321,7 +322,6 @@ const logOut = async (req, res, next) => {
     req.session.destroy();
     res.redirect("/");
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -353,18 +353,19 @@ const shopLoad = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
+    res.render('404')
   }
 };
 
 //myProfile
 const profile = async (req, res, next) => {
   try {
+    console.log('keri');
     let userdata = await req.session.user;
     user.findById(userdata).then((data) => {
       res.render("myProfile", { data, userdata, log: req.session.isLoggedIn });
     });
   } catch (err) {
-    // next(err);
     res.render('404')
     
   }
@@ -377,7 +378,6 @@ const addressForm = async (req, res, next) => {
       res.render("add-address", { data, log: req.session.isLoggedIn });
     });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -408,7 +408,6 @@ const confirmAddress = async (req, res, next) => {
     );
     res.redirect("/address");
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -424,7 +423,6 @@ const editAddress = async (req, res, next) => {
 
     res.render("editaddress", { userAddress, log: req.session.isLoggedIn });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -451,28 +449,30 @@ const confirmEdit = async (req, res, next) => {
 
     res.redirect("/address");
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
 
 // address deletion
 const removeAddres = async (req, res, next) => {
-  id = req.session.user;
+  try {
+    id = req.session.user;
 
   const profile = await user.findById(id);
   profile.address.pull(req.body.addressId);
   await profile.save();
   res.json({ status: true });
+  } catch (error) {
+    res.render('404')
+  }
 };
 
 // editProfile
 const editProfile = async (req, res, next) => {
-  console.log("entererered");
+  try {
+    console.log("entererered");
   let userdata = await req.session.user;
 
-  // const data = req.params.userId;
-  // const profile = await user.findById(id);
   user.findById(userdata).then((data) => {
     res.render("edit-userProfile", {
       data,
@@ -480,11 +480,15 @@ const editProfile = async (req, res, next) => {
       log: req.session.isLoggedIn,
     });
   });
+  } catch (error) {
+    res.render('404')
+  }
 };
 
 // editProFile
 const editProFile = async (req, res, next) => {
-  console.log("/EditproFile");
+  try {
+    console.log("/EditproFile");
   let userdata = await req.session.user;
 
   // const data = req.params.userId;
@@ -492,6 +496,9 @@ const editProFile = async (req, res, next) => {
   user.findById(userdata).then((data) => {
     res.render("edit-proFile", { data, userdata, log: req.session.isLoggedIn });
   });
+  } catch (error) {
+    res.render('404')
+  }
 };
 
 // updateUserProfile
@@ -507,7 +514,6 @@ const updateUserProfile = async (req, res, next) => {
       console.log(updateUser,'updateUser');
     res.redirect("/edit-profile");
   } catch (err) {
-    // next(err)
     res.render('404')
   }
 };
@@ -517,7 +523,6 @@ const foregetPassword = async (req, res) => {
   try {
     res.render("forget-password", { message: false });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -545,7 +550,6 @@ const ForegetverifyPassword = async (req, res) => {
       res.render("forget-password", { message: "Email is incorrect" });
     }
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -582,7 +586,6 @@ const sendresetpasswordMail = async (name, email, token) => {
       }
     });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -598,7 +601,6 @@ const changePassword = async (req, res) => {
       res.render("users/404", { message: "token is invalid" });
     }
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -616,7 +618,6 @@ const resetpassword = async (req, res) => {
     );
     res.redirect("/");
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -634,7 +635,7 @@ const ChangePassword = async (req, res) => {
       res.render("change-Password", { message })
   }
   catch (err){
-    next(err)
+    res.render('404')
   }
 }
 
@@ -661,7 +662,7 @@ const newPassword = async (req, res) => {
   }
   catch (error) {
       console.log(error.message);
-      res.render('users/404', { user: req.session.user_id })
+      res.render('404', { user: req.session.user_id })
   }
 }
 
@@ -673,7 +674,6 @@ const products = async (req, res, next) => {
       res.render("Shop", { data });
     });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -694,7 +694,6 @@ const checkout = async (req, res, next) => {
       console.log(data[0].cart[0], "datadatadatadata");
     });
   } catch (err) {
-    // next(err);
     res.render('404')
   }
 };
@@ -808,6 +807,7 @@ const confirmation = async (req, res, next) => {
   } catch (err) {
 
     res.status(500).send("Internal Server Error");
+    
   }
 };
 
@@ -976,28 +976,6 @@ const orderDetails = async (req, res, next) => {
   }
 };
 
-//order status
-// const changeStatus = (req, res, next) => {
-//   try {
-//     orderModel
-//       .findByIdAndUpdate(req.body.orderId, { orderStatus: req.body.status })
-//       .then((order) => {
-//         console.log(req.body,'req.body.status');
-//         console.log(req.body.status,'req.body.status');
-//         addToWallet(req, res, order.totalAmount, "c");
-//         console.log(order);
-//         res.json(true);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//         res.json(false);
-//       });
-//   } catch (err) {
-//     next(err);
-//     res.json(false);
-//   }
-// };
-
 const changeStatus = async (req, res, next) => {
   try {
     const orderId = req.body.orderId;
@@ -1044,7 +1022,8 @@ const changeStatus = async (req, res, next) => {
 
 //add to wallet
 const addToWallet = async (req, res, amount, transactionType) => {
-  let id = req.session.user;
+  try {
+    let id = req.session.user;
 
   await user
     .findByIdAndUpdate(id, {
@@ -1055,6 +1034,9 @@ const addToWallet = async (req, res, amount, transactionType) => {
     .then((data) => {
       console.log(data?.wallet);
     });
+  } catch (error) {
+    res.render('404')
+  }
 };
 
 //wallet
@@ -1189,7 +1171,7 @@ const filteredProducts = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
-    
+    res.render('404')
     // Handle errors appropriately
   }
 };

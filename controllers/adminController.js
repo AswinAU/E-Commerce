@@ -1,20 +1,19 @@
 const user = require("../model/userModel");
 const bcrypt = require("bcrypt");
-const categoryModel = require("../model/category-model");
-const productModel = require("../model/product-model");
+// const categoryModel = require("../model/category-model");
+// const productModel = require("../model/product-model");
 const orderModel = require("../model/order-model");
-const couponModel = require("../model/coupenModel");
-const mongodb = require("mongodb");
-const moment = require("moment")
+// const couponModel = require("../model/coupenModel");
+// const mongodb = require("mongodb");
+const moment = require("moment");
 
 //login page
 const loadLogin = async (req, res, next) => {
   try {
     res.render("adminLogin", { message: false });
   } catch (err) {
-    console.log('err');
-    // next(err);
-    res.render('404')
+    console.log("err");
+    res.render("404");
   }
 };
 
@@ -52,22 +51,19 @@ const verifyLogin = async (req, res, next) => {
       res.render("adminLogin", { message: "Email and password are incorrect" });
     }
   } catch (err) {
-    // next(err);
-    res.render('404')
+    res.render("404");
   }
 };
-
 
 // Dashboard load
 const loadDashboard = async (req, res, next) => {
   try {
     const userData = await user.findById({ _id: req.session.user_id });
     const users = await user.find({ is_admin: 0 });
-    const currentPage = '/admin/adminHome';
-    res.render("adminHome",{currentPage}); // Updated argument names
+    const currentPage = "/admin/adminHome";
+    res.render("adminHome", { currentPage ,userData }); // Updated argument names
   } catch (err) {
-    // next(err);
-    res.render('404')
+    res.render("404");
   }
 };
 
@@ -77,51 +73,47 @@ const logout = async (req, res, next) => {
     req.session.destroy();
     res.redirect("/admin");
   } catch (error) {
-    // next(err);
-    res.render('404')
+    res.render("404");
   }
 };
 
 // user-list
 const userslist = async (req, res, next) => {
   try {
-      const page = req.query.page || 1;
-      const limit = 5; // Number of users per page
-      const skip = (page - 1) * limit;
+    const page = req.query.page || 1;
+    const limit = 5; // Number of users per page
+    const skip = (page - 1) * limit;
 
-      const users = await user.find({ is_admin: 0 }).skip(skip).limit(limit);
-      const totalUsers = await user.countDocuments({ is_admin: 0 });
-      const currentPage = '/admin/userslist'
+    const users = await user.find({ is_admin: 0 }).skip(skip).limit(limit);
+    const totalUsers = await user.countDocuments({ is_admin: 0 });
+    const currentPage = "/admin/userslist";
 
-      res.render("page-sellers-list", {
-          users,
-          currentPage: page,
-          currentPage,
-          totalPages: Math.ceil(totalUsers / limit)
-      });
+    res.render("page-sellers-list", {
+      users,
+      currentPage: page,
+      currentPage,
+      totalPages: Math.ceil(totalUsers / limit),
+    });
   } catch (err) {
-      // next(err);
-      res.render('404')
+    res.render("404");
   }
 };
-
 
 //block-user
 const blockUser = async (req, res, next) => {
   try {
     const { userId } = req.body; // Extract userId from request body
-    
+
     // Assuming `user` is your Mongoose model, make sure to pass `userId` as an ObjectId
     // Update the user's verification status in the database
     await user.findByIdAndUpdate(userId, { is_verified: 0 });
-    
-    res.status(200).send('User blocked successfully'); // Send a success response back to the client
+
+    res.status(200).send("User blocked successfully"); // Send a success response back to the client
   } catch (err) {
-    console.error('Error blocking user:', err);
-    res.status(500).send('Internal Server Error'); // Send an error response back to the client
+    console.error("Error blocking user:", err);
+    res.status(500).send("Internal Server Error"); // Send an error response back to the client
   }
 };
-
 
 // unblock-user
 const unblockUser = async (req, res, next) => {
@@ -132,14 +124,12 @@ const unblockUser = async (req, res, next) => {
     // Update the user's verification status in the database
     await user.findByIdAndUpdate(userId, { is_verified: 1 });
 
-    res.status(200).send('User unblocked successfully'); // Send a success response back to the client
+    res.status(200).send("User unblocked successfully"); // Send a success response back to the client
   } catch (err) {
-    console.error('Error unblocking user:', err);
-    res.render('404')// Send an error response back to the client
+    console.error("Error unblocking user:", err);
+    res.render("404"); // Send an error response back to the client
   }
 };
-
-
 
 // orders listing in admin side
 const ShowOrders = async (req, res, next) => {
@@ -188,15 +178,13 @@ const ShowOrders = async (req, res, next) => {
       { $skip: itemsperpage * (page - 1) },
       { $limit: itemsperpage },
     ]);
-    const currentPage = '/admin/order-list';
-    const totalPages = Math.ceil( itemsperpage);
-    res.render("orders-list", { orders, totalPages, page , currentPage });
+    const currentPage = "/admin/order-list";
+    const totalPages = Math.ceil(itemsperpage);
+    res.render("orders-list", { orders, totalPages, page, currentPage });
   } catch (err) {
-    // next(err);
-    res.render('404')
+    res.render("404");
   }
 };
-
 
 const orderDetail = async (req, res) => {
   try {
@@ -216,10 +204,9 @@ const orderDetail = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.render('404')
+    res.render("404");
   }
 };
-
 
 const changeStatus = (req, res, next) => {
   try {
@@ -240,7 +227,7 @@ const changeStatus = (req, res, next) => {
 
 const monthlyreport = async (req, res) => {
   try {
-    console.log('enteredd');
+    console.log("enteredd");
     const start = moment().subtract(30, "days").startOf("day"); // Data for the last 30 days
     const end = moment().endOf("day");
 
@@ -248,8 +235,8 @@ const monthlyreport = async (req, res) => {
       createdAt: { $gte: start, $lte: end },
       orderStatus: "Delivered",
     });
-    console.log(orderSuccessDetails,'orderSuccessDetails');
-    
+    console.log(orderSuccessDetails, "orderSuccessDetails");
+
     const monthlySales = {};
 
     orderSuccessDetails.forEach((order) => {
@@ -263,7 +250,7 @@ const monthlyreport = async (req, res) => {
           razorpayCount: 0,
         };
       }
-      
+
       monthlySales[monthName].revenue += order.finalAmount;
       monthlySales[monthName].productCount += order.items.length;
       monthlySales[monthName].orderCount++;
@@ -296,18 +283,13 @@ const monthlyreport = async (req, res) => {
         );
       }
     }
-    console.log(monthlyData,'monthlyData');
+    console.log(monthlyData, "monthlyData");
     return res.json(monthlyData);
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({
-        message: "An error occurred while generating the monthly report.",
-      });
+    return res.render('404',{message: "An error occurred while generating the monthly report."})
   }
 };
-
 
 module.exports = {
   loadLogin,
@@ -321,5 +303,4 @@ module.exports = {
   orderDetail,
   changeStatus,
   monthlyreport,
-
 };

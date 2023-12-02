@@ -9,7 +9,7 @@
 					<th>Quantity</th>
 					<th>Total</th>
 					<%var total=0%>
-					<%=order[0].discount%>
+					<!-- <%=order[0].discount%> -->
 					<% for(i=0;i<order.length;i++){%>
 					<tr>
 						
@@ -22,13 +22,34 @@
 						<th width="20%" class="text-end"> ₹ <%=x%></th>
 						
 					</tr>
+					<%}%>
 					
-				
+					<tr>
+						
+						<td colspan="4">
+							<article class="float-end">
+								
+								<%name=order[0].address[0].name%>
+								<%area=order[0].address[0].area%>
+								<%landmark=order[0].address[0].landmark%>
+								<%town=order[0].address[0].town%>
+								<%state=order[0].address[0].state%>
+								<%number=order[0].address[0].number%>
+								<dd> <b class="h5">Address : </b><%=name%> </dd>
+								<dd><%=area%></dd>
+								<dd>Phone number:<%=number%></dd>
+								<dd><%=landmark%></dd>
+								<dd><%=town%>, <%=state%></dd>
+							</article>
+						</td>
+						
+					</tr>
+
 					<tr>
 						<td colspan="4">
 							<article class="float-end">
 								
-								<%}%>
+								
 								<%total=total-order[0].discount%>
 								<dd> <b class="h5">  ₹ <%=total%></b> </dd>
 								<dl class="dlist">

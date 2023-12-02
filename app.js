@@ -1,25 +1,23 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
-const path = require('path')
+const path = require("path");
 const session = require("express-session");
-const errorHandler = require("./middleware/errorhandler");
+const nocache = require("nocache");
+const userRoute = require("./routes/userRoute");
+const adminRoute = require("./routes/adminRoute");
 
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
 const app = express();
 
-const nocache = require("nocache");
 app.use(nocache());
-
 app.use(morgan("dev"));
 app.use("/public", express.static("public"));
 
-//user route;
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -31,17 +29,20 @@ app.use(
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //for userRoute
-const userRoute = require("./routes/userRoute");
 app.use("/", userRoute);
+userRoute.set("views", "./views/users");
 
 //for adminRoute
-const adminRoute = require("./routes/adminRoute");
 app.use("/admin", adminRoute);
+adminRoute.set("views", "./views/admin");
 
-app.use((req, res, next) =>{
-  res.status(404).render('404')
+app.use((req, res, next) => {
+  res.status(404).render("404");
 });
 
 app.listen(process.env.PORT, () => {

@@ -75,7 +75,7 @@
                                     <label class="form-label">quantity</label>
                                     <input placeholder="" name="quantity" type="number" min="0"
                                         value="<%=data[0].quantity%>" id="quantity" class="form-control">
-                                        <div id="quantityError" style="color: red;"></div>
+                                        
                                 </div>
                             </div>
                         </div>
@@ -168,16 +168,12 @@
             document.getElementById('discriptionError').textContent = '';
             document.getElementById('salepriceError').textContent = '';
             document.getElementById('regularpriceError').textContent = '';
-            document.getElementById('quantityError').textContent = '';
-
-
 
             // Get the values from the form
             const productName = document.getElementById('product_name').value;
             const productdescription = document.getElementById('product_description').value;
             const salesPrice = document.getElementById('saleprice').value;
             const productPrice = document.getElementById('regularprice').value;
-            const quantity = document.getElementById('quantity').value;
 
             const maxProductNameLength = 50;
             const maxProductDescriptionLength = 250;
@@ -215,8 +211,6 @@
                 return false; // Prevent form submission
             }
 
-
-            ///
             ////////////////
             if (salesPrice.trim() === '') {
                 document.getElementById('salepriceError').textContent = 'saleprice price is required.';
@@ -235,19 +229,6 @@
                 document.getElementById('regularpriceError').textContent = 'Regular price must be greater than zero.';
                 return false;
             }
-
-
-            if (quantity.trim() === '') {
-                document.getElementById('quantityError').textContent = 'Quantity is required.';
-                return false;
-            }
-            if (parseFloat(quantity) <= 0) {
-                document.getElementById('quantityError').textContent = 'Quantity must be greater than zero.';
-                return false;
-            }
-
-
-
 
             return true; // Allow form submission if all validations pass
         }

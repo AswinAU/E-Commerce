@@ -12,21 +12,6 @@ module.exports = {
       //const finalAmount = req.body.total;
     console.log(req.body,'finalAmountfinalAmount');
 
-    // Fetch the user document
-    // const userDoc = await user.findOne({ _id: req.session.user });
-
-    // // Update each element in the cart array with the finalAmount
-    // const updatedCart = userDoc.cart.map((cartItem) => {
-    //   return { ...cartItem, finalAmount };
-    // });
-    // console.log(updatedCart,'updatedCartupdatedCart');
-
-    // // Update the user document with the modified cart
-    // await user.updateOne(
-    //   { _id: req.session.user },
-    //   { $set: { cart: updatedCart } }
-    // );
-
       req.body.count = parseInt(req.body.count);
       req.body.quantity = parseInt(req.body.quantity);
 
@@ -60,7 +45,6 @@ module.exports = {
         });
       }
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -115,7 +99,6 @@ module.exports = {
         res.render("cart", { user, log: req.session.isLoggedIn });
       }
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -185,29 +168,9 @@ module.exports = {
           res.json(false);
         });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
-
-  //to remove product from cart
-  // removeProduct: (req, res, next) => {
-  //   try {
-  //     let id = req.session.isLoggedIn._id;
-  //     let proId = req.body.proId;
-  //     console.log(proId);
-  //     console.log(req.session.isLoggedIn);
-  //     User.updateOne(
-  //       { _id: id },
-  //       { $pull: { cart: { productId: proId } } }
-  //     ).then((status) => {
-  //       console.log("heloo froom controller");
-  //       res.json({ status: true });
-  //     });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // },
 
   //to add to whishlist
   addTowhishlist: async (req, res, next) => {
@@ -300,9 +263,7 @@ module.exports = {
         res.render("whishlist", { user, log: req.session.isLoggedIn });
       }
 
-      // res.render('user/whishlist',{ isLoggedIn: req.session.isLoggedIn,data:whishlistProducts,total:totalPrice })
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -321,7 +282,6 @@ module.exports = {
           res.json(false);
         });
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
@@ -348,7 +308,6 @@ module.exports = {
     );
 
     } catch (err) {
-      // next(err);
       res.render('404')
     }
   },
