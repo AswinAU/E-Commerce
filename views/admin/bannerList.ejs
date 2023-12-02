@@ -1,10 +1,13 @@
 <%- include('header') %>
+<!-- Include SweetAlert CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+
 
     <section class="content-main">
         <div class="content-header">
             <div>
-                <h2 class="content-title card-title">Categories </h2>
-                <p>Add, edit or delete a category</p>
+                <h2 class="content-title card-title">Banner </h2>
+                <p>Add, edit or delete a Banner</p>
             </div>
             <div>
                 <!-- <input type="text" placeholder="Search Categories" class="form-control bg-white"> -->
@@ -45,7 +48,7 @@
                                                 <%= i + 1 %>
                                             </td>
                                             <td>
-                                                <img src="upload/banner/<%= data[i].bannerImage[0] %>" width="80px" alt="img">
+                                                <img src="/upload/banner/<%= data[i].bannerImage[0] %>" width="80px" alt="img">
                                             </td>
                                             <!-- <td>
                                                 <%= data[i].titleOne %>
@@ -63,8 +66,7 @@
                                             <td>
                                                 <a href="/admin/edit-banner/<%= data[i]._id %>" class="btn btn-info p-1">Edit</a>
 
-                                                <button class="btn btn-danger p-1" onclick="confirmDelete('<%= data[i]._id %>')">Delete</button>
-                                            </td>
+                                                <button class="btn btn-info p-1" onclick="confirmDelete('<%= data[i]._id %>')">Delete</button>
                                         </tr>
                                     <% } %>
                                 </tbody>
@@ -95,6 +97,29 @@
         </div>
         </div>
     </footer>
+    
+<!-- Include SweetAlert JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function confirmDelete(bannerId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this banner!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If the user clicks "Yes", navigate to the delete URL
+                window.location.href = `/admin/delete-banner/${bannerId}`;
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire('Cancelled', 'Your banner is safe :)', 'info');
+            }
+        });
+    }
+</script>
 
  
     

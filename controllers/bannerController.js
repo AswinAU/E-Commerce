@@ -24,7 +24,7 @@ const createBanner = async (req, res) => {
         });
 
         await newBanner.save();
-        res.redirect('/admin/banner'); // Redirect to the banner page or handle it based on your needs
+        res.redirect('/admin/bannerList'); // Redirect to the banner page or handle it based on your needs
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Internal Server Error');
@@ -83,8 +83,17 @@ const editBanner = async (req, res) => {
     }
 };
 
-module.exports = {
-    editBanner,
-};
+const deleteBanner = async(req,res)=>{
+    console.log('jfhkd');
+    try{
+        const bannerId = req.params.bannerId;
+        const banner = await Banner.findById(bannerId)
 
-module.exports = { loadBanner,createBanner,bannerList,editBanner,editBannerPage }
+        await Banner.deleteOne(banner);
+        res.redirect('/admin/bannerList');
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
+module.exports = { loadBanner,createBanner,bannerList,editBanner,editBannerPage,deleteBanner }

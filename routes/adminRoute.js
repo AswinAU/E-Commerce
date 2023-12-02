@@ -106,5 +106,7 @@ admin_route.post("/banner", auth.isLogin,bannerUpload.single('bannerImage'), ban
 admin_route.get("/bannerList", auth.isLogin, bannerController.bannerList);
 admin_route.get("/edit-banner/:id", auth.isLogin, bannerController.editBannerPage);
 admin_route.post("/edit-banner/:id", auth.isLogin,bannerUpload.single('bannerImage'), bannerController.editBanner);
+admin_route.get("/delete-banner/:id", auth.isLogin, bannerController.deleteBanner);
+
 admin_route.use(errorHandler);
 module.exports = admin_route;
