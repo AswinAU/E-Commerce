@@ -95,7 +95,7 @@ const insertUser = async (req, res, next) => {
       repeatPassword: spassword,
       is_admin: 0,
     });
-
+    req.session.newuser = newUser;
     // Save the user to the database
     const userData = await newUser.save();
     //generate otp and send verification mail
@@ -166,11 +166,12 @@ const sendVerifyMail = async (name, email, otp) => {
 //Resend otp
 const resendOtp = async (req, res) => {
   try {
+    const data = req.session.newuser
     const userId = req.query.userId.trim();
     const otp = randomString.generate({ length: 4, charset: "numeric" });
     objj.OTP = otp;
     console.log("recent", objj.OTP);
-    await sendVerifyMail(req.body.name, req.body.email, otp);
+    await sendVerifyMail(data.name, data.email, otp);
     const userData = await user.findOne({ _id: userId });
     res.redirect(`otp?id=${userData._id}`);
   } catch (error) {
