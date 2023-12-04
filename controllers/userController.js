@@ -19,7 +19,7 @@ const { Readable } = require("stream");
 const loadHome = async (req, res, next) => {
   try {
     const banners = await Banner.find();
-    res.render("landing-page", { log: req.session.isLoggedIn ,banners});
+    res.render("userHome", { log: req.session.isLoggedIn ,banners});
   } catch (err) {
     res.render('404')
   }

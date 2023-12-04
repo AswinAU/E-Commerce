@@ -96,7 +96,7 @@ module.exports = {
           log: req.session.isLoggedIn,
         });
       } else {
-        res.render("cart", { user, log: req.session.isLoggedIn });
+        res.render("cart", { user,cart: cartProducts, log: req.session.isLoggedIn });
       }
     } catch (err) {
       res.render('404')

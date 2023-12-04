@@ -36,7 +36,7 @@
                                                     <div class="media-body">
                                                         <p>
                                                             <%=cart[i]?.ProductDetails[0]?.name%>
-                                                            
+
                                                         </p>
 
                                                     </div>
@@ -118,8 +118,14 @@
                             <form action="/check-out" method="post">
                                 <input type="hidden" name="total" id="totalInput" <%if(locals.total){%> value="
                                 <%=total%>"<%}%>>
-                                        <button type="submit" class="btn btn-success w-100 shadow-0 mb-2">proceed to
-                                            checkout</button>
+                                        <% if (cart.length===0) { %>
+                                            
+                                            </div>
+                                            <% } else { %>
+                                                <button type="submit"
+                                                    class="btn btn-success w-100 shadow-0 mb-2">proceed to
+                                                    checkout</button>
+                                                <% } %>
                             </form>
                         </div>
 
