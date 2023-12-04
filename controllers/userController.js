@@ -633,7 +633,7 @@ const ChangePassword = async (req, res) => {
             message = req?.query?.message
         }
         console.log(message,'message');
-      res.render("change-Password", { message })
+      res.render("changePassword", { message })
   }
   catch (err){
     res.render('404')
