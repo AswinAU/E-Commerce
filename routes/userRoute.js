@@ -17,7 +17,7 @@ user_route.post("/register", userController.insertUser);
 //otp validation
 user_route.get('/otp', userController.otppage)
 user_route.post("/validate", userController.validateOtp)
-user_route.get("/recentopt", userController.resendOtp)
+user_route.get("/recentOpt", userController.resendOtp)
 
 //login // logout
 user_route.get("/login", userController.loginLoad);

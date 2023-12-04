@@ -253,14 +253,14 @@ module.exports = {
           "whishlistProducts",
           whishlistProducts[0]?.ProductDetails[0]
         );
-        res.render("whishlist", {
+        res.render("whishList", {
           user,
           whishlist: whishlistProducts,
           total: totalPrice,
           log: req.session.isLoggedIn,
         });
       } else {
-        res.render("whishlist", { user, log: req.session.isLoggedIn });
+        res.render("whishList", { user, log: req.session.isLoggedIn });
       }
 
     } catch (err) {

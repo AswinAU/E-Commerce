@@ -474,7 +474,7 @@ const editProfile = async (req, res, next) => {
   let userdata = await req.session.user;
 
   user.findById(userdata).then((data) => {
-    res.render("edit-userProfile", {
+    res.render("editUserProfile", {
       data,
       userdata,
       log: req.session.isLoggedIn,
@@ -494,7 +494,7 @@ const editProFile = async (req, res, next) => {
   // const data = req.params.userId;
   // const profile = await user.findById(id);
   user.findById(userdata).then((data) => {
-    res.render("edit-proFile", { data, userdata, log: req.session.isLoggedIn });
+    res.render("editProFile", { data, userdata, log: req.session.isLoggedIn });
   });
   } catch (error) {
     res.render('404')
@@ -521,7 +521,7 @@ const updateUserProfile = async (req, res, next) => {
 //
 const foregetPassword = async (req, res) => {
   try {
-    res.render("forget-password", { message: false });
+    res.render("forgetPassword", { message: false });
   } catch (err) {
     res.render('404')
   }
@@ -534,7 +534,7 @@ const ForegetverifyPassword = async (req, res) => {
     const userData = await user.findOne({ email: email });
     if (userData) {
       if (userData.is_verified === 0) {
-        res.render("forget-password", { message: "please verify Your mail" });
+        res.render("forgetPassword", { message: "please verify Your mail" });
       } else {
         const randomstring = randomString.generate();
         const updateUser = await user.updateOne(
@@ -542,12 +542,12 @@ const ForegetverifyPassword = async (req, res) => {
           { $set: { token: randomstring } }
         );
         sendresetpasswordMail(userData.name, userData.email, randomstring);
-        res.render("forget-password", {
+        res.render("forgetPassword", {
           message: "plesase check your mail to reset a password",
         });
       }
     } else {
-      res.render("forget-password", { message: "Email is incorrect" });
+      res.render("forgetPassword", { message: "Email is incorrect" });
     }
   } catch (err) {
     res.render('404')
